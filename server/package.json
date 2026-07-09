@@ -1,0 +1,13 @@
+{
+  "name": "gluecksrad-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lokaler Session-Server fuer das Gluecksrad mit Abstimmungsfaktor (Level 2, ohne Datenbank).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  }
+}
