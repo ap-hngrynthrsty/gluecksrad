@@ -13,6 +13,7 @@ const I18N = {
     questionLabel: 'Question',
     questionWaiting: 'Waiting for the question …',
     votedHint: 'Your vote has been counted. You can change it anytime.',
+    suggestLabel: 'Suggest your own answer (optional, no name needed)',
     newAnswerPlaceholder: 'Add your own answer',
     winnerLabel: 'Winner',
     closeBtn: 'Close',
@@ -28,6 +29,7 @@ const I18N = {
     questionLabel: 'Frage',
     questionWaiting: 'Warte auf die Frage …',
     votedHint: 'Deine Stimme wurde gezählt. Du kannst sie jederzeit ändern.',
+    suggestLabel: 'Eigene Antwort vorschlagen (optional, kein Name nötig)',
     newAnswerPlaceholder: 'Eigene Antwort hinzufügen',
     winnerLabel: 'Gewinner',
     closeBtn: 'Schließen',
@@ -82,7 +84,7 @@ const el = {
   questionDisplay: document.getElementById('questionDisplay'),
   optionsList: document.getElementById('optionsList'),
   votedHint: document.getElementById('votedHint'),
-  addAnswerArea: document.getElementById('addAnswerArea'),
+  suggestArea: document.getElementById('suggestArea'),
   newAnswerInput: document.getElementById('newAnswerInput'),
   addAnswerBtn: document.getElementById('addAnswerBtn'),
   wheelCanvas: document.getElementById('wheelCanvas'),
@@ -424,7 +426,7 @@ function poll() {
 
     if (!spinning) drawWheel(data.segments);
 
-    el.addAnswerArea.classList.toggle('hidden', !data.allowParticipantAnswers);
+    el.suggestArea.classList.toggle('hidden', !data.allowParticipantAnswers);
 
     if (displayedRound === null) displayedRound = data.round;
     if (data.round !== displayedRound && !spinning && data.spin) {

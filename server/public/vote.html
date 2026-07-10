@@ -25,6 +25,14 @@
   </header>
 
   <main class="content">
+    <div id="suggestArea" class="card hidden">
+      <span class="label" data-i18n="suggestLabel"></span>
+      <div class="add-answer-area">
+        <input id="newAnswerInput" type="text" data-i18n-placeholder="newAnswerPlaceholder" maxlength="80">
+        <button id="addAnswerBtn" class="btn btn-outline-dark">+</button>
+      </div>
+    </div>
+
     <div id="nameGate" class="card">
       <span class="label" data-i18n="nameLabel"></span>
       <input id="nameInput" type="text" data-i18n-placeholder="namePlaceholder" maxlength="40">
@@ -42,11 +50,6 @@
 
       <div class="options-list" id="optionsList"></div>
       <p id="votedHint" class="hint hidden" data-i18n="votedHint"></p>
-
-      <div id="addAnswerArea" class="add-answer-area hidden">
-        <input id="newAnswerInput" type="text" data-i18n-placeholder="newAnswerPlaceholder" maxlength="80">
-        <button id="addAnswerBtn" class="btn btn-outline-dark">+</button>
-      </div>
     </div>
   </main>
 

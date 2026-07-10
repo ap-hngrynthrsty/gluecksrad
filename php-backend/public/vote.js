@@ -20,6 +20,7 @@ const I18N = {
     questionLabel: 'Question',
     questionWaiting: 'Waiting for the question …',
     votedHint: 'Your vote has been counted. You can change it anytime.',
+    suggestLabel: 'Suggest your own answer (optional, no name needed)',
     newAnswerPlaceholder: 'Add your own answer',
     winnerLabel: 'Winner',
     closeBtn: 'Close',
@@ -41,6 +42,7 @@ const I18N = {
     questionLabel: 'Frage',
     questionWaiting: 'Warte auf die Frage …',
     votedHint: 'Deine Stimme wurde gezählt. Du kannst sie jederzeit ändern.',
+    suggestLabel: 'Eigene Antwort vorschlagen (optional, kein Name nötig)',
     newAnswerPlaceholder: 'Eigene Antwort hinzufügen',
     winnerLabel: 'Gewinner',
     closeBtn: 'Schließen',
@@ -100,7 +102,7 @@ const el = {
   questionDisplay: document.getElementById('questionDisplay'),
   optionsList: document.getElementById('optionsList'),
   votedHint: document.getElementById('votedHint'),
-  addAnswerArea: document.getElementById('addAnswerArea'),
+  suggestArea: document.getElementById('suggestArea'),
   newAnswerInput: document.getElementById('newAnswerInput'),
   addAnswerBtn: document.getElementById('addAnswerBtn'),
   wheelCanvas: document.getElementById('wheelCanvas'),
@@ -135,6 +137,7 @@ async function tryEnterWithCode(code) {
   if (data.error) return false;
   localStorage.setItem('dyntune_vote_code', sessionCode);
   el.codeGate.classList.add('hidden');
+  el.suggestArea.classList.toggle('hidden', !data.allowParticipantAnswers);
   const savedName = localStorage.getItem('dyntune_name');
   myAnswerId = localStorage.getItem('dyntune_lastVote_' + sessionCode) || null;
   if (savedName) {
@@ -478,7 +481,7 @@ function applyState(data) {
 
   if (!spinning) drawWheel(data.segments);
 
-  el.addAnswerArea.classList.toggle('hidden', !data.allowParticipantAnswers);
+  el.suggestArea.classList.toggle('hidden', !data.allowParticipantAnswers);
 
   if (displayedRound === null) displayedRound = data.round;
   if (data.round !== displayedRound && !spinning && data.spin) {
@@ -489,7 +492,7 @@ function applyState(data) {
 
 let pollTimer = null;
 function poll() {
-  if (!sessionCode || el.nameGate.classList.contains('hidden') === false) return;
+  if (!sessionCode) return;
   apiGet('state.php').then(applyState).catch(() => {});
 }
 function startPolling() {
