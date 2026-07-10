@@ -394,8 +394,13 @@ function resetAll() {
 async function newSession() {
   closeWinner();
   rotation = -Math.PI / 2;
+  const previousCode = sessionCode;
   localStorage.removeItem('dyntune_lead_code');
-  const created = await fetch(`${API}create-session.php`, { method: 'POST' }).then(r => r.json());
+  const created = await fetch(`${API}create-session.php`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ previousCode })
+  }).then(r => r.json());
   sessionCode = created.code;
   localStorage.setItem('dyntune_lead_code', sessionCode);
   knownAnswerIds = [];
