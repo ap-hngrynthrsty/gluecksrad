@@ -167,3 +167,12 @@ input, button { font-family: inherit; }
   font-size: 18px; font-weight: 700; padding: 0 18px; border-radius: 12px; line-height: 1;
 }
 .btn-outline-dark:hover { border-color: #5a4bd6; color: #5a4bd6; }
+
+.topbar .lang-switch { margin-left: auto; }
+.lang-switch { display: flex; border: 1px solid #e2dfd7; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+.lang-btn {
+  appearance: none; border: none; background: #fff; color: #8a8a93; font-size: 11.5px; font-weight: 700;
+  padding: 7px 10px; cursor: pointer; letter-spacing: .03em;
+}
+.lang-btn:first-child { border-right: 1px solid #e2dfd7; }
+.lang-btn.active { background: #191922; color: #fff; }

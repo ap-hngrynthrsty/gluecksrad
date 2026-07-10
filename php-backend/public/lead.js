@@ -358,8 +358,8 @@ function addParticipant() {
   const name = el.nameInput.value.trim();
   const answerId = effVote();
   if (!name || !answerId) return;
+  el.nameInput.value = '';
   apiPost('participants.php', { action: 'add', name, answerId }).then(data => {
-    el.nameInput.value = '';
     latest = data;
     renderAnswersVotes();
     refreshNonStructural(data);

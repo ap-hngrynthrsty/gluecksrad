@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,12 +18,16 @@
       <div class="brand-icon"><span>dt</span></div>
       <div class="brand-text">
         <span class="brand-title">dyntune</span>
-        <span class="brand-sub">dynamic tuning &middot; Lead-Ansicht</span>
+        <span class="brand-sub">dynamic tuning &middot; <span data-i18n="leadSubtitle"></span></span>
       </div>
     </div>
     <div class="header-actions">
-      <button id="resetVotesBtn" class="btn btn-ghost">Stimmen zurücksetzen</button>
-      <button id="resetAllBtn" class="btn btn-ghost">Zurücksetzen</button>
+      <div class="lang-switch">
+        <button id="langEnBtn" class="lang-btn active" type="button">EN</button>
+        <button id="langDeBtn" class="lang-btn" type="button">DE</button>
+      </div>
+      <button id="resetVotesBtn" class="btn btn-ghost" data-i18n="resetVotesBtn"></button>
+      <button id="resetAllBtn" class="btn btn-ghost" data-i18n="resetAllBtn"></button>
     </div>
   </header>
 
@@ -31,19 +35,19 @@
 
     <section class="panel">
       <div class="card">
-        <div class="card-label"><span class="step">1</span>Frage</div>
-        <textarea id="questionInput" rows="2" placeholder="Welche Frage soll abgestimmt werden?"></textarea>
+        <div class="card-label"><span class="step">1</span><span data-i18n="questionLabel"></span></div>
+        <textarea id="questionInput" rows="2" data-i18n-placeholder="questionPlaceholder"></textarea>
       </div>
 
       <div class="card">
         <div class="card-row">
-          <div class="card-label"><span class="step">2</span>Antworten</div>
-          <span class="muted" id="answersCount">0 Optionen</span>
+          <div class="card-label"><span class="step">2</span><span data-i18n="answersLabel"></span></div>
+          <span class="muted" id="answersCount">0</span>
         </div>
         <div id="answersList" class="answers-list"></div>
-        <button id="addAnswerBtn" class="btn btn-dashed">+ Antwort hinzufügen</button>
+        <button id="addAnswerBtn" class="btn btn-dashed" data-i18n="addAnswerBtn"></button>
         <label class="toggle-row">
-          <span>Teilnehmer:innen dürfen Antworten hinzufügen</span>
+          <span data-i18n="allowAnswersLabel"></span>
           <span class="toggle-switch">
             <input type="checkbox" id="allowAnswersToggle">
             <span class="toggle-slider"></span>
@@ -53,23 +57,23 @@
 
       <div class="card">
         <div class="card-row">
-          <div class="card-label"><span class="step">3</span>Teilnehmer</div>
-          <span class="muted" id="participantsCount">0 Teilnehmer:innen verbunden</span>
+          <div class="card-label"><span class="step">3</span><span data-i18n="participantsLabel"></span></div>
+          <span class="muted" id="participantsCount">0</span>
         </div>
-        <input id="nameInput" type="text" placeholder="Name der Person">
+        <input id="nameInput" type="text" data-i18n-placeholder="namePlaceholder">
         <div class="row-inline">
           <select id="voteSelect"></select>
-          <button id="addParticipantBtn" class="btn btn-dark">Eintragen</button>
+          <button id="addParticipantBtn" class="btn btn-dark" data-i18n="addParticipantBtn"></button>
         </div>
-        <p class="hint">Für Personen ohne eigenes Gerät. Wer selbst per QR-Code beitritt, erscheint hier automatisch und lässt sich per × wieder entfernen.</p>
+        <p class="hint" data-i18n="participantHintLead"></p>
       </div>
 
       <div class="card qr-card">
-        <div class="card-label"><span class="step">4</span>Beitreten</div>
+        <div class="card-label"><span class="step">4</span><span data-i18n="joinLabel"></span></div>
         <div class="qr-wrap">
-          <img id="qrImg" alt="QR-Code zum Beitreten" width="150" height="150">
+          <img id="qrImg" alt="QR code to join" width="150" height="150">
           <div class="qr-info">
-            <span class="muted">Im selben WLAN mit dem Handy scannen, oder Link öffnen:</span>
+            <span class="muted" data-i18n="qrHint"></span>
             <code id="joinUrl">…</code>
           </div>
         </div>
@@ -78,8 +82,8 @@
 
     <section class="stage">
       <div class="question-display">
-        <span class="eyebrow">Frage</span>
-        <h1 id="questionDisplay">Deine Frage erscheint hier</h1>
+        <span class="eyebrow" data-i18n="questionEyebrow"></span>
+        <h1 id="questionDisplay"></h1>
       </div>
 
       <div class="wheel-wrap">
@@ -88,8 +92,8 @@
       </div>
 
       <div class="spin-area">
-        <button id="spinBtn" class="btn btn-spin" disabled>Drehen</button>
-        <span class="muted" id="statusLine">0 Stimmen · 0 Optionen</span>
+        <button id="spinBtn" class="btn btn-spin" disabled data-i18n="spinBtn"></button>
+        <span class="muted" id="statusLine">0</span>
       </div>
     </section>
 
@@ -98,13 +102,13 @@
   <div id="winnerOverlay" class="winner-overlay hidden">
     <canvas id="confettiCanvas"></canvas>
     <div id="winnerCard" class="winner-card hidden">
-      <span class="winner-eyebrow">Gewinner</span>
+      <span class="winner-eyebrow" data-i18n="winnerLabel"></span>
       <div id="winnerBadge" class="winner-badge"></div>
       <div id="winnerLabel" class="winner-label glitch" data-text=""></div>
       <span class="winner-meta" id="winnerMeta"></span>
       <div class="winner-actions">
-        <button id="closeWinnerBtn" class="btn btn-outline">Schließen</button>
-        <button id="againBtn" class="btn btn-dark">Nochmal drehen</button>
+        <button id="closeWinnerBtn" class="btn btn-outline" data-i18n="closeBtn"></button>
+        <button id="againBtn" class="btn btn-dark" data-i18n="spinAgainBtn"></button>
       </div>
     </div>
   </div>
