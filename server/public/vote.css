@@ -155,3 +155,15 @@ input, button { font-family: inherit; }
 @keyframes popIn {
   0% { transform: scale(.75); opacity: 0; } 60% { transform: scale(1.04); } 100% { transform: scale(1); opacity: 1; }
 }
+
+.add-answer-area { display: flex; gap: 8px; width: 100%; }
+.add-answer-area input {
+  flex: 1; min-width: 0; padding: 12px 14px; border: 1px solid #e7e5df; border-radius: 12px;
+  font-size: 15px; background: #fafaf8; outline: none;
+}
+.add-answer-area input:focus { border-color: #5a4bd6; background: #fff; }
+.btn-outline-dark {
+  border: 1.5px dashed #d4d0c6; background: transparent; color: #6c6c76;
+  font-size: 18px; font-weight: 700; padding: 0 18px; border-radius: 12px; line-height: 1;
+}
+.btn-outline-dark:hover { border-color: #5a4bd6; color: #5a4bd6; }

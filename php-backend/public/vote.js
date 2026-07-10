@@ -49,6 +49,9 @@ const el = {
   questionDisplay: document.getElementById('questionDisplay'),
   optionsList: document.getElementById('optionsList'),
   votedHint: document.getElementById('votedHint'),
+  addAnswerArea: document.getElementById('addAnswerArea'),
+  newAnswerInput: document.getElementById('newAnswerInput'),
+  addAnswerBtn: document.getElementById('addAnswerBtn'),
   wheelCanvas: document.getElementById('wheelCanvas'),
   pointer: document.getElementById('pointer'),
   winnerOverlay: document.getElementById('winnerOverlay'),
@@ -400,6 +403,15 @@ function closeWinner() {
 }
 el.closeWinnerBtn.addEventListener('click', closeWinner);
 
+function addOwnAnswer() {
+  const label = el.newAnswerInput.value.trim();
+  if (!label) return;
+  el.newAnswerInput.value = '';
+  apiPost('answers.php', { action: 'add', label }).catch(() => {});
+}
+el.addAnswerBtn.addEventListener('click', addOwnAnswer);
+el.newAnswerInput.addEventListener('keydown', e => { if (e.key === 'Enter') addOwnAnswer(); });
+
 // ---------- poll ----------
 function applyState(data) {
   if (data.error) return;
@@ -412,6 +424,8 @@ function applyState(data) {
   else updateOptionLabels(data.answers);
 
   if (!spinning) drawWheel(data.segments);
+
+  el.addAnswerArea.classList.toggle('hidden', !data.allowParticipantAnswers);
 
   if (displayedRound === null) displayedRound = data.round;
   if (data.round !== displayedRound && !spinning && data.spin) {

@@ -22,7 +22,8 @@ const session = {
   answers: [],       // { id, label }
   participants: [],  // { id, deviceId (null for leads-added), name, answerId }
   round: 0,
-  lastSpin: null      // { segments, winner } frozen at the moment /api/spin was called
+  lastSpin: null,     // { segments, winner } frozen at the moment /api/spin was called
+  allowParticipantAnswers: false
 };
 
 function voteCounts() {
@@ -61,7 +62,8 @@ function publicState() {
     segments: computeSegments(),
     participantsCount: session.participants.length,
     round: session.round,
-    spin: session.lastSpin
+    spin: session.lastSpin,
+    allowParticipantAnswers: session.allowParticipantAnswers
   };
 }
 
@@ -194,6 +196,12 @@ const server = http.createServer(async (req, res) => {
       session.participants = [];
       session.round = 0;
       session.lastSpin = null;
+      session.allowParticipantAnswers = false;
+      return sendJSON(res, 200, publicState());
+    }
+    if (pathname === '/api/settings' && req.method === 'POST') {
+      const body = await readJSON(req);
+      session.allowParticipantAnswers = !!body.allowParticipantAnswers;
       return sendJSON(res, 200, publicState());
     }
     if (pathname === '/api/spin' && req.method === 'POST') {

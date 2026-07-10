@@ -11,4 +11,14 @@ foreach ($statements as $stmt) {
     $db->exec($stmt);
 }
 
-echo json_encode(['ok' => true, 'message' => 'Tabellen angelegt bzw. bereits vorhanden.']);
+// Migrations for columns added after the initial CREATE TABLE (which only
+// runs on brand-new tables) - safe to re-run, errors from an already-existing
+// column are simply ignored.
+$migrations = [
+    "ALTER TABLE sessions ADD COLUMN allow_participant_answers TINYINT(1) NOT NULL DEFAULT 0",
+];
+foreach ($migrations as $m) {
+    try { $db->exec($m); } catch (PDOException $e) { /* column likely already exists */ }
+}
+
+echo json_encode(['ok' => true, 'message' => 'Tabellen angelegt/aktualisiert.']);

@@ -118,6 +118,7 @@ function publicState($db, $session) {
         'segments' => computeSegments($db, $sessionId),
         'participantsCount' => $participantsCount,
         'round' => (int)$session['round'],
-        'spin' => $session['spin_data'] ? json_decode($session['spin_data'], true) : null
+        'spin' => $session['spin_data'] ? json_decode($session['spin_data'], true) : null,
+        'allowParticipantAnswers' => (bool)$session['allow_participant_answers']
     ];
 }

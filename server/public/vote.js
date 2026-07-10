@@ -43,6 +43,9 @@ const el = {
   questionDisplay: document.getElementById('questionDisplay'),
   optionsList: document.getElementById('optionsList'),
   votedHint: document.getElementById('votedHint'),
+  addAnswerArea: document.getElementById('addAnswerArea'),
+  newAnswerInput: document.getElementById('newAnswerInput'),
+  addAnswerBtn: document.getElementById('addAnswerBtn'),
   wheelCanvas: document.getElementById('wheelCanvas'),
   pointer: document.getElementById('pointer'),
   winnerOverlay: document.getElementById('winnerOverlay'),
@@ -354,6 +357,19 @@ function closeWinner() {
 }
 el.closeWinnerBtn.addEventListener('click', closeWinner);
 
+function addOwnAnswer() {
+  const label = el.newAnswerInput.value.trim();
+  if (!label) return;
+  el.newAnswerInput.value = '';
+  fetch('/api/answers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ label })
+  }).catch(() => {});
+}
+el.addAnswerBtn.addEventListener('click', addOwnAnswer);
+el.newAnswerInput.addEventListener('keydown', e => { if (e.key === 'Enter') addOwnAnswer(); });
+
 // ---------- poll ----------
 function poll() {
   fetch('/api/state').then(r => r.json()).then(data => {
@@ -366,6 +382,8 @@ function poll() {
     else updateOptionLabels(data.answers);
 
     if (!spinning) drawWheel(data.segments);
+
+    el.addAnswerArea.classList.toggle('hidden', !data.allowParticipantAnswers);
 
     if (displayedRound === null) displayedRound = data.round;
     if (data.round !== displayedRound && !spinning && data.spin) {

@@ -21,6 +21,7 @@ const el = {
   answersList: document.getElementById('answersList'),
   answersCount: document.getElementById('answersCount'),
   addAnswerBtn: document.getElementById('addAnswerBtn'),
+  allowAnswersToggle: document.getElementById('allowAnswersToggle'),
   participantsCount: document.getElementById('participantsCount'),
   nameInput: document.getElementById('nameInput'),
   voteSelect: document.getElementById('voteSelect'),
@@ -475,6 +476,10 @@ function refreshNonStructural(data) {
     updateSpinButton();
   }
 
+  if (document.activeElement !== el.allowAnswersToggle) {
+    el.allowAnswersToggle.checked = !!data.allowParticipantAnswers;
+  }
+
   if (displayedRound === null) displayedRound = data.round;
   if (data.round !== displayedRound && !spinning && data.spin) {
     displayedRound = data.round;
@@ -509,6 +514,11 @@ el.questionInput.addEventListener('input', () => {
   }, 400);
 });
 el.addAnswerBtn.addEventListener('click', addAnswer);
+el.allowAnswersToggle.addEventListener('change', () => {
+  api('POST', '/api/settings', { allowParticipantAnswers: el.allowAnswersToggle.checked }).then(data => {
+    latest = data;
+  });
+});
 el.nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') addParticipant(); });
 el.addParticipantBtn.addEventListener('click', addParticipant);
 el.resetVotesBtn.addEventListener('click', resetVotes);
