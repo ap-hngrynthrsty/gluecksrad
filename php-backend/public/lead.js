@@ -38,6 +38,7 @@ const el = {
   statusLine: document.getElementById('statusLine'),
   codeDisplay: document.getElementById('codeDisplay'),
   joinUrl: document.getElementById('joinUrl'),
+  qrCode: document.getElementById('qrCode'),
   copyLinkBtn: document.getElementById('copyLinkBtn'),
   winnerOverlay: document.getElementById('winnerOverlay'),
   confettiCanvas: document.getElementById('confettiCanvas'),
@@ -495,6 +496,12 @@ function updateCodeDisplay() {
   el.codeDisplay.textContent = sessionCode || '------';
   const url = `${location.origin}${location.pathname.replace('lead.html', 'vote.html')}?code=${sessionCode}`;
   el.joinUrl.textContent = url;
+  if (sessionCode && window.qrcode) {
+    const qr = qrcode(0, 'M');
+    qr.addData(url);
+    qr.make();
+    el.qrCode.innerHTML = qr.createImgTag(4, 0);
+  }
 }
 
 function refreshNonStructural(data) {

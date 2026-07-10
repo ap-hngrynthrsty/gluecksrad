@@ -10,3 +10,7 @@
     Require all denied
 </Files>
 Options -Indexes
+
+# Wer die nackte Domain aufruft, landet direkt auf der Lead-Ansicht statt
+# einem 403 (kein Index in diesem Ordner).
+RedirectMatch 302 ^/$ /public/lead.html

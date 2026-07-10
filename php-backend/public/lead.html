@@ -60,12 +60,17 @@
 
       <div class="card code-card">
         <div class="card-label"><span class="step">4</span>Beitreten (weltweit)</div>
-        <div class="code-display" id="codeDisplay">------</div>
-        <div class="row-inline">
-          <code id="joinUrl" class="join-url">…</code>
-          <button id="copyLinkBtn" class="btn btn-ghost">Kopieren</button>
+        <div class="qr-wrap">
+          <div id="qrCode" class="qr-code"></div>
+          <div class="qr-info">
+            <div class="code-display" id="codeDisplay">------</div>
+            <div class="row-inline">
+              <code id="joinUrl" class="join-url">…</code>
+              <button id="copyLinkBtn" class="btn btn-ghost">Kopieren</button>
+            </div>
+          </div>
         </div>
-        <p class="hint">Diesen Link an beliebige Personen schicken - Internetverbindung reicht, kein gemeinsames WLAN nötig.</p>
+        <p class="hint">QR-Code scannen, Link schicken oder Code eintippen - Internetverbindung reicht, kein gemeinsames WLAN nötig.</p>
       </div>
     </section>
 
@@ -107,6 +112,7 @@
   <a href="privacy.html" class="privacy-link">Datenschutz</a>
 
 </div>
+<script src="qrcode.min.js"></script>
 <script src="lead.js"></script>
 </body>
 </html>
