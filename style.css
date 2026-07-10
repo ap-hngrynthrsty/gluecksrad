@@ -235,3 +235,11 @@ input, textarea, select, button { font-family: inherit; }
 @keyframes spinPulse {
   0%,100% { box-shadow: 0 10px 34px rgba(90,75,214,.32); } 50% { box-shadow: 0 12px 48px rgba(90,75,214,.5); }
 }
+
+.lang-switch { display: flex; border: 1px solid #e2dfd7; border-radius: 10px; overflow: hidden; }
+.lang-btn {
+  appearance: none; border: none; background: #fff; color: #8a8a93; font-size: 12px; font-weight: 700;
+  padding: 8px 12px; cursor: pointer; letter-spacing: .03em;
+}
+.lang-btn:first-child { border-right: 1px solid #e2dfd7; }
+.lang-btn.active { background: #191922; color: #fff; }

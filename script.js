@@ -5,6 +5,65 @@ const CONFIG = {
   spinDuration: 9.5
 };
 
+const I18N = {
+  en: {
+    resetVotesBtn: 'Reset votes',
+    resetAllBtn: 'Reset',
+    questionLabel: 'Question',
+    questionPlaceholder: 'Which question should be voted on?',
+    answersLabel: 'Answers',
+    addAnswerBtn: '+ Add answer',
+    participantsLabel: 'Participants',
+    namePlaceholder: 'Name',
+    addParticipantBtn: 'Add',
+    participantHint: 'Choose an existing answer to join others’ votes. More votes = bigger segment.',
+    questionEyebrow: 'Question',
+    questionDisplayPlaceholder: 'Your question will appear here',
+    spinBtn: 'Spin',
+    spinningBtn: 'Spinning …',
+    winnerLabel: 'Winner',
+    closeBtn: 'Close',
+    spinAgainBtn: 'Spin again',
+    noVotesYet: 'No votes yet',
+    answerPlaceholder: n => `Answer ${n}`,
+    optionsCount: n => `${n} option${n === 1 ? '' : 's'}`,
+    votesCount: n => `${n} vote${n === 1 ? '' : 's'}`,
+    statusLine(v, o) { return `${this.votesCount(v)} · ${this.optionsCount(o)}`; },
+    winnerMeta(v, p) { return `${this.votesCount(v)} · ${p}% of votes`; }
+  },
+  de: {
+    resetVotesBtn: 'Stimmen zurücksetzen',
+    resetAllBtn: 'Zurücksetzen',
+    questionLabel: 'Frage',
+    questionPlaceholder: 'Welche Frage soll abgestimmt werden?',
+    answersLabel: 'Antworten',
+    addAnswerBtn: '+ Antwort hinzufügen',
+    participantsLabel: 'Teilnehmer',
+    namePlaceholder: 'Name der Person',
+    addParticipantBtn: 'Eintragen',
+    participantHint: 'Wähle eine bestehende Antwort, um dich den Stimmen anderer anzuschließen. Mehr Stimmen = größeres Segment.',
+    questionEyebrow: 'Frage',
+    questionDisplayPlaceholder: 'Deine Frage erscheint hier',
+    spinBtn: 'Drehen',
+    spinningBtn: 'Dreht …',
+    winnerLabel: 'Gewinner',
+    closeBtn: 'Schließen',
+    spinAgainBtn: 'Nochmal drehen',
+    noVotesYet: 'Noch keine Stimmen',
+    answerPlaceholder: n => `Antwort ${n}`,
+    optionsCount: n => `${n} Optionen`,
+    votesCount: n => `${n} Stimmen`,
+    statusLine(v, o) { return `${this.votesCount(v)} · ${this.optionsCount(o)}`; },
+    winnerMeta(v, p) { return `${this.votesCount(v)} · ${p}% der Stimmen`; }
+  }
+};
+let lang = localStorage.getItem('dyntune_lang') || 'en';
+function t(key, ...args) {
+  const dict = I18N[lang];
+  const entry = dict[key];
+  return typeof entry === 'function' ? entry.apply(dict, args) : entry;
+}
+
 const state = {
   question: '',
   answers: [],      // { id, label }
@@ -44,7 +103,9 @@ const el = {
   winnerMeta: document.getElementById('winnerMeta'),
   closeWinnerBtn: document.getElementById('closeWinnerBtn'),
   againBtn: document.getElementById('againBtn'),
-  flicker: document.getElementById('flicker')
+  flicker: document.getElementById('flicker'),
+  langEnBtn: document.getElementById('langEnBtn'),
+  langDeBtn: document.getElementById('langDeBtn')
 };
 
 function uid() { return 'x' + Math.random().toString(36).slice(2, 9); }
@@ -128,7 +189,7 @@ function drawWheel() {
     ctx.fillStyle = '#eceae4'; ctx.fill();
     ctx.fillStyle = '#a2a2ab'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.font = `600 ${Math.round(S * 0.03)}px 'Instrument Sans',sans-serif`;
-    ctx.fillText('Noch keine Stimmen', cx, cy);
+    ctx.fillText(t('noVotesYet'), cx, cy);
     return;
   }
   drawFace(ctx, S, rotation, true);
@@ -250,10 +311,10 @@ function fillWinnerCard() {
   if (!winner) return;
   el.winnerBadge.textContent = winner.number;
   el.winnerBadge.style.background = winner.color;
-  const text = winner.label || `Antwort ${winner.number}`;
+  const text = winner.label || t('answerPlaceholder', winner.number);
   el.winnerLabel.textContent = text;
   el.winnerLabel.dataset.text = text;
-  el.winnerMeta.textContent = `${winner.votes} Stimmen · ${winner.pct}% der Stimmen`;
+  el.winnerMeta.textContent = t('winnerMeta', winner.votes, winner.pct);
 }
 function showWinnerFlicker() {
   fillWinnerCard();
@@ -388,11 +449,11 @@ function renderAnswers() {
     const input = document.createElement('input');
     input.className = 'answer-input';
     input.value = a.label;
-    input.placeholder = `Antwort ${i + 1}`;
+    input.placeholder = t('answerPlaceholder', i + 1);
     input.addEventListener('input', () => {
       a.label = input.value;
       const opt = el.voteSelect.querySelector(`option[value="${a.id}"]`);
-      if (opt) opt.textContent = `${i + 1}. ${a.label || `Antwort ${i + 1}`}`;
+      if (opt) opt.textContent = `${i + 1}. ${a.label || t('answerPlaceholder', i + 1)}`;
     });
     input.addEventListener('keydown', e => { if (e.key === 'Enter') addAnswer(); });
 
@@ -443,7 +504,7 @@ function renderDropdown() {
   state.answers.forEach((a, i) => {
     const opt = document.createElement('option');
     opt.value = a.id;
-    opt.textContent = `${i + 1}. ${a.label || `Antwort ${i + 1}`}`;
+    opt.textContent = `${i + 1}. ${a.label || t('answerPlaceholder', i + 1)}`;
     el.voteSelect.appendChild(opt);
   });
   state.voteAnswerId = effVote();
@@ -451,19 +512,44 @@ function renderDropdown() {
 }
 
 function updateCounts() {
-  el.answersCount.textContent = `${state.answers.length} Optionen`;
-  el.participantsCount.textContent = `${state.participants.length} Stimmen`;
-  el.statusLine.textContent = `${state.participants.length} Stimmen · ${state.answers.length} Optionen`;
+  el.answersCount.textContent = t('optionsCount', state.answers.length);
+  el.participantsCount.textContent = t('votesCount', state.participants.length);
+  el.statusLine.textContent = t('statusLine', state.participants.length, state.answers.length);
 }
 
 function updateSpinButton() {
   const disabled = getSegments().length < 2 || spinning;
   el.spinBtn.disabled = disabled;
-  el.spinBtn.textContent = spinning ? 'Dreht …' : 'Drehen';
+  el.spinBtn.textContent = spinning ? t('spinningBtn') : t('spinBtn');
 }
 
 function updateQuestionDisplay() {
-  el.questionDisplay.textContent = state.question.trim() || 'Deine Frage erscheint hier';
+  el.questionDisplay.textContent = state.question.trim() || t('questionDisplayPlaceholder');
+}
+
+function applyStaticI18n() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(elm => {
+    elm.textContent = t(elm.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(elm => {
+    elm.placeholder = t(elm.dataset.i18nPlaceholder);
+  });
+  el.langEnBtn.classList.toggle('active', lang === 'en');
+  el.langDeBtn.classList.toggle('active', lang === 'de');
+}
+
+function setLang(newLang) {
+  lang = newLang;
+  localStorage.setItem('dyntune_lang', lang);
+  applyStaticI18n();
+  renderAnswers();
+  renderDropdown();
+  updateCounts();
+  updateSpinButton();
+  updateQuestionDisplay();
+  drawWheel();
+  if (winner) fillWinnerCard();
 }
 
 // ---------- wiring ----------
@@ -487,7 +573,10 @@ el.resetAllBtn.addEventListener('click', resetAll);
 el.spinBtn.addEventListener('click', spin);
 el.closeWinnerBtn.addEventListener('click', closeWinner);
 el.againBtn.addEventListener('click', nochmal);
+el.langEnBtn.addEventListener('click', () => setLang('en'));
+el.langDeBtn.addEventListener('click', () => setLang('de'));
 
+applyStaticI18n();
 renderAnswers();
 renderDropdown();
 updateCounts();
