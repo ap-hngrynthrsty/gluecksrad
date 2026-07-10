@@ -5,6 +5,87 @@ const CONFIG = {
   spinDuration: 9.5
 };
 
+const I18N = {
+  en: {
+    leadSubtitle: 'lead view (internet)',
+    resetVotesBtn: 'Reset votes',
+    resetAllBtn: 'Reset',
+    newSessionBtn: 'New session',
+    questionLabel: 'Question',
+    questionPlaceholder: 'Which question should be voted on?',
+    answersLabel: 'Answers',
+    addAnswerBtn: '+ Add answer',
+    allowAnswersLabel: 'Participants can add answers',
+    participantsLabel: 'Participants',
+    namePlaceholder: 'Name',
+    addParticipantBtn: 'Add',
+    participantHintLeadWeb: 'For people without their own device. Anyone joining via the link appears here automatically and can be removed with ×.',
+    joinLabelWeb: 'Join (worldwide)',
+    joinHintWeb: 'Scan the QR code, share the link, or type the code - an internet connection is enough, no shared WiFi needed.',
+    copyBtn: 'Copy',
+    copiedBtn: 'Copied!',
+    questionEyebrow: 'Question',
+    questionDisplayPlaceholder: 'Your question will appear here',
+    spinBtn: 'Spin',
+    spinningBtn: 'Spinning …',
+    winnerLabel: 'Winner',
+    closeBtn: 'Close',
+    spinAgainBtn: 'Spin again',
+    noVotesYet: 'No votes yet',
+    removeParticipantTitle: 'Remove participant',
+    privacyLink: 'Privacy',
+    newSessionConfirm: 'Start a new session? The current join link will stop working.',
+    answerPlaceholder: n => `Answer ${n}`,
+    optionsCount: n => `${n} option${n === 1 ? '' : 's'}`,
+    votesCount: n => `${n} vote${n === 1 ? '' : 's'}`,
+    participantsConnected: n => `${n} participant${n === 1 ? '' : 's'} connected`,
+    statusLine(v, o) { return `${this.votesCount(v)} · ${this.optionsCount(o)}`; },
+    winnerMeta(v, p) { return `${this.votesCount(v)} · ${p}% of votes`; }
+  },
+  de: {
+    leadSubtitle: 'Lead-Ansicht (Internet)',
+    resetVotesBtn: 'Stimmen zurücksetzen',
+    resetAllBtn: 'Zurücksetzen',
+    newSessionBtn: 'Neue Session',
+    questionLabel: 'Frage',
+    questionPlaceholder: 'Welche Frage soll abgestimmt werden?',
+    answersLabel: 'Antworten',
+    addAnswerBtn: '+ Antwort hinzufügen',
+    allowAnswersLabel: 'Teilnehmer:innen dürfen Antworten hinzufügen',
+    participantsLabel: 'Teilnehmer',
+    namePlaceholder: 'Name der Person',
+    addParticipantBtn: 'Eintragen',
+    participantHintLeadWeb: 'Für Personen ohne eigenes Gerät. Wer selbst über den Link beitritt, erscheint hier automatisch und lässt sich per × wieder entfernen.',
+    joinLabelWeb: 'Beitreten (weltweit)',
+    joinHintWeb: 'QR-Code scannen, Link schicken oder Code eintippen - Internetverbindung reicht, kein gemeinsames WLAN nötig.',
+    copyBtn: 'Kopieren',
+    copiedBtn: 'Kopiert!',
+    questionEyebrow: 'Frage',
+    questionDisplayPlaceholder: 'Deine Frage erscheint hier',
+    spinBtn: 'Drehen',
+    spinningBtn: 'Dreht …',
+    winnerLabel: 'Gewinner',
+    closeBtn: 'Schließen',
+    spinAgainBtn: 'Nochmal drehen',
+    noVotesYet: 'Noch keine Stimmen',
+    removeParticipantTitle: 'Teilnehmer:in entfernen',
+    privacyLink: 'Datenschutz',
+    newSessionConfirm: 'Neue Session starten? Der aktuelle Beitritts-Link wird ungültig.',
+    answerPlaceholder: n => `Antwort ${n}`,
+    optionsCount: n => `${n} Optionen`,
+    votesCount: n => `${n} Stimmen`,
+    participantsConnected: n => `${n} Teilnehmer:innen verbunden`,
+    statusLine(v, o) { return `${this.votesCount(v)} · ${this.optionsCount(o)}`; },
+    winnerMeta(v, p) { return `${this.votesCount(v)} · ${p}% der Stimmen`; }
+  }
+};
+let lang = localStorage.getItem('dyntune_lang') || 'en';
+function t(key, ...args) {
+  const dict = I18N[lang];
+  const entry = dict[key];
+  return typeof entry === 'function' ? entry.apply(dict, args) : entry;
+}
+
 const API = '../api/';
 let sessionCode = localStorage.getItem('dyntune_lead_code');
 
@@ -49,7 +130,9 @@ const el = {
   winnerMeta: document.getElementById('winnerMeta'),
   closeWinnerBtn: document.getElementById('closeWinnerBtn'),
   againBtn: document.getElementById('againBtn'),
-  flicker: document.getElementById('flicker')
+  flicker: document.getElementById('flicker'),
+  langEnBtn: document.getElementById('langEnBtn'),
+  langDeBtn: document.getElementById('langDeBtn')
 };
 
 function colorFor(i, n) {
@@ -125,7 +208,7 @@ function drawWheel(segs) {
     ctx.fillStyle = '#eceae4'; ctx.fill();
     ctx.fillStyle = '#a2a2ab'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.font = `600 ${Math.round(S * 0.03)}px 'Instrument Sans',sans-serif`;
-    ctx.fillText('Noch keine Stimmen', cx, cy);
+    ctx.fillText(t('noVotesYet'), cx, cy);
     return;
   }
   drawFace(ctx, S, rotation, segs, true);
@@ -286,10 +369,10 @@ function fillWinnerCard() {
   if (!winner) return;
   el.winnerBadge.textContent = winner.number;
   el.winnerBadge.style.background = colorFor(winner.number - 1, latest.answers.length);
-  const text = winner.label || `Antwort ${winner.number}`;
+  const text = winner.label || t('answerPlaceholder', winner.number);
   el.winnerLabel.textContent = text;
   el.winnerLabel.dataset.text = text;
-  el.winnerMeta.textContent = `${winner.votes} Stimmen · ${winner.pct}% der Stimmen`;
+  el.winnerMeta.textContent = t('winnerMeta', winner.votes, winner.pct);
 }
 function showWinnerFlicker() {
   fillWinnerCard();
@@ -334,7 +417,7 @@ function deleteAnswer(id) {
       const numberEl = r.querySelector('.answer-number');
       numberEl.textContent = i + 1;
       numberEl.style.background = colorFor(i, data.answers.length);
-      r.querySelector('.answer-input').placeholder = `Antwort ${i + 1}`;
+      r.querySelector('.answer-input').placeholder = t('answerPlaceholder', i + 1);
     });
     knownAnswerIds = data.answers.map(a => a.id);
     renderVoteSelect();
@@ -378,7 +461,7 @@ function renderVoteSelect() {
   latest.answers.forEach((a, i) => {
     const opt = document.createElement('option');
     opt.value = a.id;
-    opt.textContent = `${i + 1}. ${a.label || `Antwort ${i + 1}`}`;
+    opt.textContent = `${i + 1}. ${a.label || t('answerPlaceholder', i + 1)}`;
     el.voteSelect.appendChild(opt);
   });
   const ids = latest.answers.map(a => a.id);
@@ -428,7 +511,7 @@ function buildAnswerRow(a, i, n) {
   const input = document.createElement('input');
   input.className = 'answer-input';
   input.value = a.label;
-  input.placeholder = `Antwort ${i + 1}`;
+  input.placeholder = t('answerPlaceholder', i + 1);
   input.addEventListener('change', () => renameAnswer(a.id, input.value));
   input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
 
@@ -461,7 +544,7 @@ function buildVoterChip(v) {
   const del = document.createElement('button');
   del.className = 'voter-chip-remove';
   del.textContent = '×';
-  del.title = 'Teilnehmer:in entfernen';
+  del.title = t('removeParticipantTitle');
   del.addEventListener('click', () => deleteParticipant(v.id));
   chip.append(name, del);
   return chip;
@@ -490,7 +573,7 @@ function renderAnswersVotes() {
 function updateSpinButton() {
   const disabled = latest.segments.length < 2 || spinning;
   el.spinBtn.disabled = disabled;
-  el.spinBtn.textContent = spinning ? 'Dreht …' : 'Drehen';
+  el.spinBtn.textContent = spinning ? t('spinningBtn') : t('spinBtn');
 }
 
 function updateCodeDisplay() {
@@ -507,14 +590,14 @@ function updateCodeDisplay() {
 
 function refreshNonStructural(data) {
   latest = data;
-  el.answersCount.textContent = `${data.answers.length} Optionen`;
-  el.participantsCount.textContent = `${data.participantsCount} Teilnehmer:innen verbunden`;
-  el.statusLine.textContent = `${data.participantsCount} Stimmen · ${data.answers.length} Optionen`;
+  el.answersCount.textContent = t('optionsCount', data.answers.length);
+  el.participantsCount.textContent = t('participantsConnected', data.participantsCount);
+  el.statusLine.textContent = t('statusLine', data.participantsCount, data.answers.length);
 
   if (!questionDebounce && document.activeElement !== el.questionInput) {
     el.questionInput.value = data.question;
   }
-  el.questionDisplay.textContent = (data.question || '').trim() || 'Deine Frage erscheint hier';
+  el.questionDisplay.textContent = (data.question || '').trim() || t('questionDisplayPlaceholder');
 
   if (!spinning) {
     drawWheel(data.segments);
@@ -553,7 +636,7 @@ function poll() {
 // ---------- wiring ----------
 el.questionInput.addEventListener('input', () => {
   clearTimeout(questionDebounce);
-  el.questionDisplay.textContent = el.questionInput.value.trim() || 'Deine Frage erscheint hier';
+  el.questionDisplay.textContent = el.questionInput.value.trim() || t('questionDisplayPlaceholder');
   questionDebounce = setTimeout(() => {
     questionDebounce = null;
     apiPost('question.php', { question: el.questionInput.value });
@@ -570,19 +653,38 @@ el.addParticipantBtn.addEventListener('click', addParticipant);
 el.resetVotesBtn.addEventListener('click', resetVotes);
 el.resetAllBtn.addEventListener('click', resetAll);
 el.newSessionBtn.addEventListener('click', () => {
-  if (confirm('Neue Session starten? Der aktuelle Beitritts-Link wird ungueltig.')) newSession();
+  if (confirm(t('newSessionConfirm'))) newSession();
 });
 el.spinBtn.addEventListener('click', spin);
 el.closeWinnerBtn.addEventListener('click', closeWinner);
 el.againBtn.addEventListener('click', nochmal);
 el.copyLinkBtn.addEventListener('click', () => {
   navigator.clipboard.writeText(el.joinUrl.textContent).then(() => {
-    el.copyLinkBtn.textContent = 'Kopiert!';
-    setTimeout(() => { el.copyLinkBtn.textContent = 'Kopieren'; }, 1500);
+    el.copyLinkBtn.textContent = t('copiedBtn');
+    setTimeout(() => { el.copyLinkBtn.textContent = t('copyBtn'); }, 1500);
   });
 });
 
+function applyStaticI18n() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(elm => { elm.textContent = t(elm.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(elm => { elm.placeholder = t(elm.dataset.i18nPlaceholder); });
+  el.langEnBtn.classList.toggle('active', lang === 'en');
+  el.langDeBtn.classList.toggle('active', lang === 'de');
+}
+function setLang(newLang) {
+  lang = newLang;
+  localStorage.setItem('dyntune_lang', lang);
+  applyStaticI18n();
+  renderAnswersStructure();
+  refreshNonStructural(latest);
+  if (winner) fillWinnerCard();
+}
+el.langEnBtn.addEventListener('click', () => setLang('en'));
+el.langDeBtn.addEventListener('click', () => setLang('de'));
+
 (async function init() {
+  applyStaticI18n();
   await bootstrapSession();
   updateCodeDisplay();
   poll();

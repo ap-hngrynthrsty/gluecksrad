@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>dyntune - Abstimmen</title>
+<title>dyntune - Vote</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -18,25 +18,29 @@
       <span class="brand-title">dyntune</span>
       <span class="brand-sub">dynamic tuning</span>
     </div>
+    <div class="lang-switch">
+      <button id="langEnBtn" class="lang-btn active" type="button">EN</button>
+      <button id="langDeBtn" class="lang-btn" type="button">DE</button>
+    </div>
   </header>
 
   <main class="content">
     <div id="codeGate" class="card hidden">
-      <span class="label">Session-Code</span>
-      <input id="codeInput" type="text" placeholder="z. B. AB3XQ9" maxlength="8" style="text-transform:uppercase;">
-      <button id="codeContinueBtn" class="btn btn-dark" disabled>Weiter</button>
-      <p class="hint">Den Code bekommst du von der Person, die die Abstimmung gestartet hat.</p>
+      <span class="label" data-i18n="codeLabel"></span>
+      <input id="codeInput" type="text" data-i18n-placeholder="codePlaceholder" maxlength="8" style="text-transform:uppercase;">
+      <button id="codeContinueBtn" class="btn btn-dark" disabled data-i18n="continueBtn"></button>
+      <p class="hint" data-i18n="codeHint"></p>
     </div>
 
     <div id="nameGate" class="card hidden">
-      <span class="label">Dein Name</span>
-      <input id="nameInput" type="text" placeholder="z. B. Alex" maxlength="40">
-      <button id="nameContinueBtn" class="btn btn-dark" disabled>Weiter</button>
+      <span class="label" data-i18n="nameLabel"></span>
+      <input id="nameInput" type="text" data-i18n-placeholder="namePlaceholder" maxlength="40">
+      <button id="nameContinueBtn" class="btn btn-dark" disabled data-i18n="continueBtn"></button>
     </div>
 
     <div id="voteArea" class="vote-area hidden">
-      <span class="label">Frage</span>
-      <h1 id="questionDisplay">Warte auf die Frage …</h1>
+      <span class="label" data-i18n="questionLabel"></span>
+      <h1 id="questionDisplay"></h1>
 
       <div class="wheel-wrap">
         <div id="pointer" class="pointer"></div>
@@ -44,10 +48,10 @@
       </div>
 
       <div class="options-list" id="optionsList"></div>
-      <p id="votedHint" class="hint hidden">Deine Stimme wurde gezählt. Du kannst sie jederzeit ändern.</p>
+      <p id="votedHint" class="hint hidden" data-i18n="votedHint"></p>
 
       <div id="addAnswerArea" class="add-answer-area hidden">
-        <input id="newAnswerInput" type="text" placeholder="Eigene Antwort hinzufügen" maxlength="80">
+        <input id="newAnswerInput" type="text" data-i18n-placeholder="newAnswerPlaceholder" maxlength="80">
         <button id="addAnswerBtn" class="btn btn-outline-dark">+</button>
       </div>
     </div>
@@ -56,16 +60,16 @@
   <div id="winnerOverlay" class="winner-overlay hidden">
     <canvas id="confettiCanvas"></canvas>
     <div id="winnerCard" class="winner-card hidden">
-      <span class="winner-eyebrow">Gewinner</span>
+      <span class="winner-eyebrow" data-i18n="winnerLabel"></span>
       <div id="winnerBadge" class="winner-badge"></div>
       <div id="winnerLabel" class="winner-label glitch" data-text=""></div>
       <span class="winner-meta" id="winnerMeta"></span>
-      <button id="closeWinnerBtn" class="btn btn-outline">Schließen</button>
+      <button id="closeWinnerBtn" class="btn btn-outline" data-i18n="closeBtn"></button>
     </div>
   </div>
 
   <div id="flicker" class="flicker hidden"></div>
-  <a href="privacy.html" class="privacy-link">Datenschutz</a>
+  <a href="privacy.html" class="privacy-link" data-i18n="privacyLink"></a>
 </div>
 <script src="vote.js"></script>
 </body>

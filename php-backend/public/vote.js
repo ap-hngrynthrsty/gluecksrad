@@ -7,6 +7,57 @@ const CONFIG = {
 
 const API = '../api/';
 
+const I18N = {
+  en: {
+    codeLabel: 'Session code',
+    codePlaceholder: 'e.g. AB3XQ9',
+    codeHint: 'You get the code from the person who started the vote.',
+    codeCheckingBtn: 'Checking …',
+    codeNotFoundPlaceholder: 'Code not found - try again',
+    nameLabel: 'Your name',
+    namePlaceholder: 'e.g. Alex',
+    continueBtn: 'Continue',
+    questionLabel: 'Question',
+    questionWaiting: 'Waiting for the question …',
+    votedHint: 'Your vote has been counted. You can change it anytime.',
+    newAnswerPlaceholder: 'Add your own answer',
+    winnerLabel: 'Winner',
+    closeBtn: 'Close',
+    privacyLink: 'Privacy',
+    noVotesYet: 'No votes yet',
+    answerPlaceholder: n => `Answer ${n}`,
+    votesCount: n => `${n} vote${n === 1 ? '' : 's'}`,
+    winnerMeta(v, p) { return `${this.votesCount(v)} · ${p}% of votes`; }
+  },
+  de: {
+    codeLabel: 'Session-Code',
+    codePlaceholder: 'z. B. AB3XQ9',
+    codeHint: 'Den Code bekommst du von der Person, die die Abstimmung gestartet hat.',
+    codeCheckingBtn: 'Prüfe …',
+    codeNotFoundPlaceholder: 'Code nicht gefunden - nochmal prüfen',
+    nameLabel: 'Dein Name',
+    namePlaceholder: 'z. B. Alex',
+    continueBtn: 'Weiter',
+    questionLabel: 'Frage',
+    questionWaiting: 'Warte auf die Frage …',
+    votedHint: 'Deine Stimme wurde gezählt. Du kannst sie jederzeit ändern.',
+    newAnswerPlaceholder: 'Eigene Antwort hinzufügen',
+    winnerLabel: 'Gewinner',
+    closeBtn: 'Schließen',
+    privacyLink: 'Datenschutz',
+    noVotesYet: 'Noch keine Stimmen',
+    answerPlaceholder: n => `Antwort ${n}`,
+    votesCount: n => `${n} Stimmen`,
+    winnerMeta(v, p) { return `${this.votesCount(v)} · ${p}% der Stimmen`; }
+  }
+};
+let lang = localStorage.getItem('dyntune_lang') || 'en';
+function t(key, ...args) {
+  const dict = I18N[lang];
+  const entry = dict[key];
+  return typeof entry === 'function' ? entry.apply(dict, args) : entry;
+}
+
 function colorFor(i, n) {
   const scheme = CONFIG.paletteScheme;
   const f = n <= 1 ? 0.5 : i / (n - 1);
@@ -61,7 +112,9 @@ const el = {
   winnerLabel: document.getElementById('winnerLabel'),
   winnerMeta: document.getElementById('winnerMeta'),
   closeWinnerBtn: document.getElementById('closeWinnerBtn'),
-  flicker: document.getElementById('flicker')
+  flicker: document.getElementById('flicker'),
+  langEnBtn: document.getElementById('langEnBtn'),
+  langDeBtn: document.getElementById('langDeBtn')
 };
 
 function apiGet(path) {
@@ -100,13 +153,13 @@ el.codeInput.addEventListener('input', () => {
 el.codeInput.addEventListener('keydown', e => { if (e.key === 'Enter' && el.codeInput.value.trim()) el.codeContinueBtn.click(); });
 el.codeContinueBtn.addEventListener('click', async () => {
   el.codeContinueBtn.disabled = true;
-  el.codeContinueBtn.textContent = 'Prüfe …';
+  el.codeContinueBtn.textContent = t('codeCheckingBtn');
   const ok = await tryEnterWithCode(el.codeInput.value);
   if (!ok) {
     el.codeContinueBtn.disabled = false;
-    el.codeContinueBtn.textContent = 'Weiter';
+    el.codeContinueBtn.textContent = t('continueBtn');
     el.codeInput.style.borderColor = '#e0563f';
-    el.codeInput.placeholder = 'Code nicht gefunden - nochmal prüfen';
+    el.codeInput.placeholder = t('codeNotFoundPlaceholder');
   }
 });
 
@@ -166,7 +219,7 @@ function renderOptions(answers) {
 
     const label = document.createElement('span');
     label.className = 'option-label';
-    label.textContent = a.label || `Antwort ${i + 1}`;
+    label.textContent = a.label || t('answerPlaceholder', i + 1);
 
     const check = document.createElement('span');
     check.className = 'option-check';
@@ -185,7 +238,7 @@ function updateOptionLabels(answers) {
     if (!btn) return;
     btn.querySelector('.option-number').style.background = colorFor(i, answers.length);
     btn.querySelector('.option-number').textContent = i + 1;
-    btn.querySelector('.option-label').textContent = a.label || `Antwort ${i + 1}`;
+    btn.querySelector('.option-label').textContent = a.label || t('answerPlaceholder', i + 1);
   });
 }
 
@@ -227,7 +280,7 @@ function drawWheel(segs) {
     ctx.fillStyle = '#eceae4'; ctx.fill();
     ctx.fillStyle = '#a2a2ab'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.font = `600 ${Math.round(S * 0.045)}px 'Instrument Sans',sans-serif`;
-    ctx.fillText('Noch keine Stimmen', cx, cy);
+    ctx.fillText(t('noVotesYet'), cx, cy);
     return;
   }
   drawFace(ctx, S, rotation, segs, latest.answers.length);
@@ -377,10 +430,10 @@ function fillWinnerCard() {
   if (!winner) return;
   el.winnerBadge.textContent = winner.number;
   el.winnerBadge.style.background = colorFor(winner.number - 1, latest.answers.length);
-  const text = winner.label || `Antwort ${winner.number}`;
+  const text = winner.label || t('answerPlaceholder', winner.number);
   el.winnerLabel.textContent = text;
   el.winnerLabel.dataset.text = text;
-  el.winnerMeta.textContent = `${winner.votes} Stimmen · ${winner.pct}% der Stimmen`;
+  el.winnerMeta.textContent = t('winnerMeta', winner.votes, winner.pct);
 }
 function showWinnerFlicker() {
   fillWinnerCard();
@@ -416,7 +469,7 @@ el.newAnswerInput.addEventListener('keydown', e => { if (e.key === 'Enter') addO
 function applyState(data) {
   if (data.error) return;
   latest = data;
-  el.questionDisplay.textContent = (data.question || '').trim() || 'Warte auf die Frage …';
+  el.questionDisplay.textContent = (data.question || '').trim() || t('questionWaiting');
 
   const idsChanged = knownIds.length !== data.answers.length ||
     data.answers.some((a, i) => a.id !== knownIds[i]);
@@ -443,4 +496,25 @@ function startPolling() {
   if (pollTimer) return;
   pollTimer = setInterval(poll, 1000);
 }
+
+function applyStaticI18n() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(elm => { elm.textContent = t(elm.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(elm => { elm.placeholder = t(elm.dataset.i18nPlaceholder); });
+  el.langEnBtn.classList.toggle('active', lang === 'en');
+  el.langDeBtn.classList.toggle('active', lang === 'de');
+}
+function setLang(newLang) {
+  lang = newLang;
+  localStorage.setItem('dyntune_lang', lang);
+  applyStaticI18n();
+  el.questionDisplay.textContent = (latest.question || '').trim() || t('questionWaiting');
+  renderOptions(latest.answers);
+  if (!spinning) drawWheel(latest.segments);
+  if (winner) fillWinnerCard();
+}
+el.langEnBtn.addEventListener('click', () => setLang('en'));
+el.langDeBtn.addEventListener('click', () => setLang('de'));
+
+applyStaticI18n();
 startPolling();

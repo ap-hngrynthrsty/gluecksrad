@@ -280,3 +280,11 @@ input, textarea, select, button { font-family: inherit; }
 }
 .toggle-switch input:checked + .toggle-slider { background: #5a4bd6; }
 .toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+.lang-switch { display: flex; border: 1px solid #e2dfd7; border-radius: 10px; overflow: hidden; }
+.lang-btn {
+  appearance: none; border: none; background: #fff; color: #8a8a93; font-size: 12px; font-weight: 700;
+  padding: 8px 12px; cursor: pointer; letter-spacing: .03em;
+}
+.lang-btn:first-child { border-right: 1px solid #e2dfd7; }
+.lang-btn.active { background: #191922; color: #fff; }
