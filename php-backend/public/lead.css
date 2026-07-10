@@ -251,3 +251,9 @@ input, textarea, select, button { font-family: inherit; }
 @keyframes spinPulse {
   0%,100% { box-shadow: 0 10px 34px rgba(90,75,214,.32); } 50% { box-shadow: 0 12px 48px rgba(90,75,214,.5); }
 }
+
+.privacy-link {
+  position: fixed; bottom: 10px; right: 14px; font-size: 11.5px; color: #b0abaf;
+  text-decoration: none; z-index: 1300;
+}
+.privacy-link:hover { color: #5a4bd6; }

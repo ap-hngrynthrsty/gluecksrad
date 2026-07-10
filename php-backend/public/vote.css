@@ -155,3 +155,9 @@ input, button { font-family: inherit; }
 @keyframes popIn {
   0% { transform: scale(.75); opacity: 0; } 60% { transform: scale(1.04); } 100% { transform: scale(1); opacity: 1; }
 }
+
+.privacy-link {
+  display: block; text-align: center; font-size: 11.5px; color: #b0abaf;
+  text-decoration: none; padding: 16px 0 8px;
+}
+.privacy-link:hover { color: #5a4bd6; }
