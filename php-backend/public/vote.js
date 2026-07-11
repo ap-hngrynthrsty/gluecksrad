@@ -565,7 +565,6 @@ function startHearts() {
   heartsRaf = requestAnimationFrame(draw);
 }
 function celebrateSupport() {
-  window.open('https://ko-fi.com/niludu', '_blank', 'noopener');
   vibrate([30, 40, 30, 40, 30, 40, 200]);
 
   document.body.classList.add('support-shake');
@@ -580,6 +579,13 @@ function celebrateSupport() {
   el.supportOverlay.classList.remove('hidden');
   startHearts();
   setTimeout(() => el.supportOverlay.classList.add('hidden'), 18000);
+
+  // Open ko-fi last, and slightly deferred: on many mobile browsers
+  // window.open() immediately backgrounds this tab, which throttles
+  // requestAnimationFrame and can make the celebration above appear to
+  // start very late. Queuing it after a frame lets the shake/hearts/
+  // text actually paint first.
+  setTimeout(() => window.open('https://ko-fi.com/niludu', '_blank', 'noopener'), 60);
 }
 el.supportBtn.addEventListener('click', celebrateSupport);
 

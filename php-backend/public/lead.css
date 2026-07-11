@@ -41,7 +41,6 @@ input, textarea, select, button { font-family: inherit; }
 .btn-ghost {
   border: 1px solid #e2dfd7; background: #fff; color: #4a4a53; font-size: 13px; padding: 9px 15px;
 }
-.btn-ghost:hover { border-color: #c9c5bb; color: #191922; }
 
 /* ---------- layout ---------- */
 .layout {
@@ -96,7 +95,6 @@ input, textarea, select, button { font-family: inherit; }
   flex-shrink: 0; width: 28px; height: 28px; border: none; background: transparent;
   color: #b8b4ab; font-size: 19px; line-height: 1; cursor: pointer; border-radius: 7px;
 }
-.delete-btn:hover { background: #f4eceb; color: #e0563f; }
 .voters-row { display: flex; flex-wrap: wrap; gap: 5px; padding-left: 36px; }
 .voter-chip {
   display: inline-flex; align-items: center; gap: 5px;
@@ -107,13 +105,11 @@ input, textarea, select, button { font-family: inherit; }
   appearance: none; border: none; background: transparent; cursor: pointer;
   color: #b8b4ab; font-size: 13px; line-height: 1; padding: 0 2px; border-radius: 50%;
 }
-.voter-chip-remove:hover { color: #e0563f; background: #f4eceb; }
 
 .btn-dashed {
   border: 1.5px dashed #d4d0c6; background: transparent; color: #6c6c76;
   font-size: 13.5px; font-weight: 600; padding: 11px; border-radius: 11px;
 }
-.btn-dashed:hover { border-color: #5a4bd6; color: #5a4bd6; }
 
 #nameInput {
   width: 100%; padding: 10px 12px; border: 1px solid #e7e5df; border-radius: 10px;
@@ -130,7 +126,6 @@ input, textarea, select, button { font-family: inherit; }
   border: none; background: #191922; color: #fff; font-size: 14px; font-weight: 600;
   padding: 10px 18px; border-radius: 10px; white-space: nowrap;
 }
-.btn-dark:hover { background: #000; }
 .hint { margin: 0; font-size: 12px; color: #a2a2ab; line-height: 1.4; }
 
 /* ---------- session code card ---------- */
@@ -180,7 +175,6 @@ input, textarea, select, button { font-family: inherit; }
   font-size: 17px; letter-spacing: .01em; padding: 15px 46px; border-radius: 14px;
   animation: spinPulse 2.4s ease-in-out infinite;
 }
-.btn-spin:hover:not(:disabled) { background: #4a3cc4; }
 .btn-spin:active:not(:disabled) { transform: translateY(1px); }
 .btn-spin:disabled { background: #c7c3e6; cursor: not-allowed; animation: none; opacity: .7; }
 
@@ -219,7 +213,6 @@ input, textarea, select, button { font-family: inherit; }
   border: 1px solid rgba(255,255,255,.25); background: transparent; color: #e6e6ee;
   font-size: 15px; font-weight: 600; padding: 12px 26px; border-radius: 12px;
 }
-.btn-outline:hover { background: rgba(255,255,255,.08); }
 
 .flicker {
   position: fixed; inset: 0; z-index: 1200; background: #fff; pointer-events: none;
@@ -263,7 +256,6 @@ input, textarea, select, button { font-family: inherit; }
   position: fixed; bottom: 10px; right: 14px; font-size: 11.5px; color: #b0abaf;
   text-decoration: none; z-index: 1300;
 }
-.privacy-link:hover { color: #5a4bd6; }
 
 .toggle-row {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -294,7 +286,6 @@ input, textarea, select, button { font-family: inherit; }
   background: linear-gradient(135deg, #ff6b6b, #ff2d75); border: none; border-radius: 20px;
   padding: 8px 14px; cursor: pointer; z-index: 1300; box-shadow: 0 3px 10px rgba(255,45,117,.35);
 }
-.support-btn:hover { filter: brightness(1.08); }
 
 .support-overlay {
   position: fixed; inset: 0; z-index: 1450; display: flex; align-items: center; justify-content: center;
@@ -355,4 +346,27 @@ input, textarea, select, button { font-family: inherit; }
      in that corner once the layout stacks - let it flow in place
      (it sits right after the wheel/spin section in the DOM) instead. */
   .support-btn { position: static; display: block; width: max-content; margin: 20px auto 6px; }
+
+  /* Any focused field under 16px makes iOS Safari auto-zoom the whole
+     page in, which then looks cropped since layout doesn't reflow to
+     match - keeping every field at >=16px stops that zoom entirely. */
+  #questionInput, .answer-input, #nameInput, #voteSelect { font-size: 16px; }
 }
+
+/* Buttons only get a hover style when a real pointer (mouse) is present.
+   Without this, touchscreens apply :hover on the first tap and only
+   fire the actual click on a second tap - this is why Spin/Tip/etc.
+   could feel unresponsive on phones. */
+@media (hover: hover) and (pointer: fine) {
+  .btn-ghost:hover { border-color: #c9c5bb; color: #191922; }
+  .delete-btn:hover { background: #f4eceb; color: #e0563f; }
+  .voter-chip-remove:hover { color: #e0563f; background: #f4eceb; }
+  .btn-dashed:hover { border-color: #5a4bd6; color: #5a4bd6; }
+  .btn-dark:hover { background: #000; }
+  .btn-spin:hover:not(:disabled) { background: #4a3cc4; }
+  .btn-outline:hover { background: rgba(255,255,255,.08); }
+  .privacy-link:hover { color: #5a4bd6; }
+  .support-btn:hover { filter: brightness(1.08); }
+}
+
+.btn, .support-btn { touch-action: manipulation; }

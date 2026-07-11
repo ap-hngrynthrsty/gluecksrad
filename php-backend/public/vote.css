@@ -48,12 +48,10 @@ input, button { font-family: inherit; }
 .btn { appearance: none; cursor: pointer; border-radius: 12px; font-weight: 600; border: none; }
 .btn-dark { background: #191922; color: #fff; font-size: 15px; padding: 13px; }
 .btn-dark:disabled { background: #d4d2cc; cursor: not-allowed; }
-.btn-dark:hover:not(:disabled) { background: #000; }
 .btn-outline {
   border: 1px solid rgba(255,255,255,.25); background: transparent; color: #e6e6ee;
   font-size: 15px; font-weight: 600; padding: 12px 26px; border-radius: 12px;
 }
-.btn-outline:hover { background: rgba(255,255,255,.08); }
 
 .vote-area { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
 #questionDisplay {
@@ -160,7 +158,6 @@ input, button { font-family: inherit; }
   display: block; text-align: center; font-size: 11.5px; color: #b0abaf;
   text-decoration: none; padding: 16px 0 8px;
 }
-.privacy-link:hover { color: #5a4bd6; }
 
 .add-answer-area { display: flex; gap: 8px; width: 100%; }
 .add-answer-area input {
@@ -172,7 +169,6 @@ input, button { font-family: inherit; }
   border: 1.5px dashed #d4d0c6; background: transparent; color: #6c6c76;
   font-size: 18px; font-weight: 700; padding: 0 18px; border-radius: 12px; line-height: 1;
 }
-.btn-outline-dark:hover { border-color: #5a4bd6; color: #5a4bd6; }
 
 .topbar .lang-switch { margin-left: auto; }
 .lang-switch { display: flex; border: 1px solid #e2dfd7; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
@@ -189,7 +185,6 @@ input, button { font-family: inherit; }
   background: linear-gradient(135deg, #ff6b6b, #ff2d75); border: none; border-radius: 20px;
   padding: 9px 16px; cursor: pointer; z-index: 1300; box-shadow: 0 3px 10px rgba(255,45,117,.35);
 }
-.support-btn:hover { filter: brightness(1.08); }
 
 .support-overlay {
   position: fixed; inset: 0; z-index: 1450; display: flex; align-items: center; justify-content: center;
@@ -234,3 +229,22 @@ input, button { font-family: inherit; }
   30% { transform: translate(-50%,-60%) scale(1) rotate(0deg); opacity: 1; }
   100% { transform: translate(-50%,-220%) scale(.8) rotate(-8deg); opacity: 0; }
 }
+
+/* Keeping this field at >=16px stops iOS Safari from auto-zooming the
+   page in on focus (which then looks cropped, since layout doesn't
+   reflow to match the zoom). */
+.add-answer-area input { font-size: 16px; }
+
+/* Buttons only get a hover style when a real pointer (mouse) is present.
+   Without this, touchscreens apply :hover on the first tap and only
+   fire the actual click on a second tap - this is why Spin/Tip/etc.
+   could feel unresponsive on phones. */
+@media (hover: hover) and (pointer: fine) {
+  .btn-dark:hover:not(:disabled) { background: #000; }
+  .btn-outline:hover { background: rgba(255,255,255,.08); }
+  .btn-outline-dark:hover { border-color: #5a4bd6; color: #5a4bd6; }
+  .privacy-link:hover { color: #5a4bd6; }
+  .support-btn:hover { filter: brightness(1.08); }
+}
+
+.btn, .support-btn { touch-action: manipulation; }
