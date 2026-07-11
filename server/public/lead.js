@@ -210,6 +210,11 @@ function segIndexFor(segs, rot) {
   return segs.length - 1;
 }
 
+// ---------- vibration (Android only - iOS Safari has no Vibration API) ----------
+function vibrate(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
 // ---------- audio ----------
 function ensureAudio() {
   if (CONFIG.soundOn === false) return null;
@@ -314,7 +319,7 @@ function animateSpinTo(win, segs) {
     rotation = start + delta * easeOutCubic(t);
     drawWheel(segs);
     const s = segIndexFor(segs, rotation);
-    if (s !== lastSeg) { lastSeg = s; playClick(1 - t); rattlePointer(); }
+    if (s !== lastSeg) { lastSeg = s; playClick(1 - t); rattlePointer(); vibrate(12); }
     if (t < 1) requestAnimationFrame(step);
     else finishSpin(win);
   }
@@ -332,6 +337,7 @@ function finishSpin(win) {
     showWinnerCard();
     startConfetti();
     playFanfare();
+    vibrate([40, 30, 40, 30, 160]);
   }, 1600);
 }
 
@@ -566,6 +572,7 @@ function refreshNonStructural(data) {
   if (data.round !== displayedRound && !spinning && data.spin) {
     displayedRound = data.round;
     winner = data.spin.winner;
+    vibrate([40, 30, 40, 30, 160]);
     fillWinnerCard();
     el.winnerOverlay.classList.remove('hidden');
     el.flicker.classList.add('hidden');
@@ -664,6 +671,7 @@ function startHearts() {
 }
 function celebrateSupport() {
   window.open('https://ko-fi.com/niludu', '_blank', 'noopener');
+  vibrate([30, 40, 30, 40, 30, 40, 200]);
 
   document.body.classList.add('support-shake');
   setTimeout(() => document.body.classList.remove('support-shake'), 10000);
@@ -700,6 +708,7 @@ document.addEventListener("pointerup", e => {
   const isDouble = now - lastTapAt < 350 && Math.hypot(e.clientX - lastTapX, e.clientY - lastTapY) < 60;
   if (isDouble) {
     spawnLikeHeart(e.clientX, e.clientY);
+    vibrate(18);
     lastTapAt = 0;
   } else {
     lastTapAt = now; lastTapX = e.clientX; lastTapY = e.clientY;
