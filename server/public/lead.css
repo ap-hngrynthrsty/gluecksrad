@@ -51,6 +51,21 @@ input, textarea, select, button { font-family: inherit; }
   display: flex; flex-direction: column; gap: 16px; overflow-y: auto;
   max-height: calc(100vh - 116px); padding-right: 6px;
 }
+.help-toggle {
+  appearance: none; border: 1px solid #e2dfd7; background: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 7px; border-radius: 20px;
+  font-size: 12px; font-weight: 600; color: #8a8a93; letter-spacing: .02em;
+}
+.help-toggle-icon { display: inline-block; font-size: 10px; transition: transform .15s; }
+.help-toggle[aria-expanded="true"] .help-toggle-icon { transform: rotate(180deg); }
+.help-panel {
+  background: #f8f7f3; border: 1px solid #ece9e2; border-radius: 14px; padding: 13px 15px;
+  display: flex; flex-direction: column; gap: 7px; font-size: 12.5px; color: #5a5a63; line-height: 1.5;
+}
+.help-panel p { margin: 0; }
+.help-panel strong { color: #191922; }
+
 .card {
   background: #fff; border: 1px solid #ece9e2; border-radius: 16px; padding: 17px;
   display: flex; flex-direction: column; gap: 11px; box-shadow: 0 1px 2px rgba(20,20,30,.03);
@@ -360,6 +375,7 @@ input, textarea, select, button { font-family: inherit; }
    could feel unresponsive on phones. */
 @media (hover: hover) and (pointer: fine) {
   .like-btn:hover { transform: scale(1.15); }
+  .help-toggle:hover { border-color: #c9c5bb; color: #191922; }
   .btn-ghost:hover { border-color: #c9c5bb; color: #191922; }
   .delete-btn:hover { background: #f4eceb; color: #e0563f; }
   .voter-chip-remove:hover { color: #e0563f; background: #f4eceb; }
@@ -370,7 +386,7 @@ input, textarea, select, button { font-family: inherit; }
   .support-btn:hover { filter: brightness(1.08); }
 }
 
-.btn, .support-btn { touch-action: manipulation; }
+.btn, .support-btn, .help-toggle { touch-action: manipulation; }
 
 .milestone-overlay {
   position: fixed; inset: 0; z-index: 1600; display: flex; align-items: center; justify-content: center;

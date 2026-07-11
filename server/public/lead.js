@@ -33,6 +33,11 @@ const I18N = {
     supportBtn: '☕ Buy me a coffee',
     supportThanks: 'Thank you!',
     sessionsLabel: 'sessions',
+    helpToggleLabel: 'Explanation',
+    helpStep1: 'Type the question you want people to vote on.',
+    helpStep2: 'Collect the answer options people can choose from. Use the toggle to let anyone who joins via QR code add their own answer too.',
+    helpStep3: "Add people manually here if they don't have their own device - pick their preferred answer for them.",
+    helpStep4: 'Share the QR code or link so people on the same WiFi can join and vote from their own phone.',
     milestoneSession: n => `🎉 Congratulations - you just started session #${n}!`,
     milestoneHeart: n => `🎉 You just gave heart #${n} - thank you!`,
     answerPlaceholder: n => `Answer ${n}`,
@@ -69,6 +74,11 @@ const I18N = {
     supportBtn: '☕ Spendier mir einen Kaffee',
     supportThanks: 'Danke!',
     sessionsLabel: 'Sessions',
+    helpToggleLabel: 'Erklärung',
+    helpStep1: 'Hier gibst du die Frage ein, über die abgestimmt werden soll.',
+    helpStep2: 'Sammle hier die Antwortmöglichkeiten. Über den Schalter kannst du erlauben, dass auch Personen, die per QR-Code beitreten, eigene Antworten hinzufügen.',
+    helpStep3: 'Füge hier Personen manuell hinzu, die kein eigenes Gerät haben - wähle direkt ihre bevorzugte Antwort für sie aus.',
+    helpStep4: 'Teile den QR-Code oder Link, damit Personen im selben WLAN von ihrem eigenen Handy beitreten und abstimmen können.',
     milestoneSession: n => `🎉 Herzlichen Glückwunsch - du hast gerade Session Nr. ${n} gestartet!`,
     milestoneHeart: n => `🎉 Du hast gerade Herz Nr. ${n} verschenkt - danke!`,
     answerPlaceholder: n => `Antwort ${n}`,
@@ -137,7 +147,9 @@ const el = {
   sessionsCount: document.getElementById('sessionsCount'),
   milestoneOverlay: document.getElementById('milestoneOverlay'),
   milestoneConfetti: document.getElementById('milestoneConfetti'),
-  milestoneText: document.getElementById('milestoneText')
+  milestoneText: document.getElementById('milestoneText'),
+  helpToggle: document.getElementById('helpToggle'),
+  helpPanel: document.getElementById('helpPanel')
 };
 
 function colorFor(i, n) {
@@ -664,6 +676,12 @@ function setLang(newLang) {
 }
 el.langEnBtn.addEventListener('click', () => setLang('en'));
 el.langDeBtn.addEventListener('click', () => setLang('de'));
+
+el.helpToggle.addEventListener('click', () => {
+  const expanded = el.helpToggle.getAttribute('aria-expanded') === 'true';
+  el.helpToggle.setAttribute('aria-expanded', String(!expanded));
+  el.helpPanel.classList.toggle('hidden', expanded);
+});
 
 fetch('/api/qr').then(r => r.json()).then(data => {
   el.qrImg.src = data.dataUrl;

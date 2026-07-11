@@ -42,6 +42,17 @@
   <main class="layout">
 
     <section class="panel">
+      <button id="helpToggle" class="help-toggle" type="button" aria-expanded="false">
+        <span data-i18n="helpToggleLabel"></span>
+        <span class="help-toggle-icon">▾</span>
+      </button>
+      <div id="helpPanel" class="help-panel hidden">
+        <p><strong>1.</strong> <span data-i18n="helpStep1"></span></p>
+        <p><strong>2.</strong> <span data-i18n="helpStep2"></span></p>
+        <p><strong>3.</strong> <span data-i18n="helpStep3"></span></p>
+        <p><strong>4.</strong> <span data-i18n="helpStep4"></span></p>
+      </div>
+
       <div class="card">
         <div class="card-label"><span class="step">1</span><span data-i18n="questionLabel"></span></div>
         <textarea id="questionInput" rows="2" data-i18n-placeholder="questionPlaceholder"></textarea>
