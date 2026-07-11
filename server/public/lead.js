@@ -463,7 +463,7 @@ function resetAll() {
   rotation = -Math.PI / 2;
   el.questionInput.value = '';
   el.nameInput.value = '';
-  api('POST', '/api/reset-all').then(applyState);
+  api('POST', '/api/reset-all').then(applyState).then(pollStats);
 }
 
 // ---------- rendering ----------

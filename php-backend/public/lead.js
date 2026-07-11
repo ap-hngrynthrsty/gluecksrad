@@ -517,6 +517,7 @@ async function newSession() {
   displayedRound = null;
   updateCodeDisplay();
   poll();
+  pollStats();
 }
 
 // ---------- rendering ----------
