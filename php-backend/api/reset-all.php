@@ -8,9 +8,10 @@ $session = requireSession($db, $body);
 
 $db->prepare('DELETE FROM participants WHERE session_id = ?')->execute([$session['id']]);
 $db->prepare('DELETE FROM answers WHERE session_id = ?')->execute([$session['id']]);
-$db->prepare('UPDATE sessions SET question = \'\', round = 0, spin_data = NULL WHERE id = ?')->execute([$session['id']]);
+$db->prepare('UPDATE sessions SET question = \'\', round = 0, spin_data = NULL, allow_participant_answers = 0 WHERE id = ?')->execute([$session['id']]);
 
 $session['question'] = '';
 $session['round'] = 0;
 $session['spin_data'] = null;
+$session['allow_participant_answers'] = 0;
 echo json_encode(publicState($db, $session));

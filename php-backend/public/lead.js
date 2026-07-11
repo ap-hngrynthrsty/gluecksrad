@@ -488,6 +488,9 @@ function resetAll() {
 async function newSession() {
   closeWinner();
   rotation = -Math.PI / 2;
+  el.questionInput.value = '';
+  el.nameInput.value = '';
+  el.allowAnswersToggle.checked = false;
   const previousCode = sessionCode;
   localStorage.removeItem('dyntune_lead_code');
   const created = await fetch(`${API}create-session.php`, {

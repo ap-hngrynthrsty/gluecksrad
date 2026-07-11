@@ -1,0 +1,8 @@
+# Assets change frequently during active development - always make the
+# browser revalidate with the server (fast 304 via ETag) instead of quietly
+# serving a stale cached copy of html/js/css, which looks like a broken app.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html|js|css)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+</IfModule>
