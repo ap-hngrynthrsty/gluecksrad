@@ -644,8 +644,14 @@ function applyState(data) {
   const idsChanged = knownAnswerIds.length !== data.answers.length ||
     data.answers.some((a, i) => a.id !== knownAnswerIds[i]);
   latest = data;
-  if (idsChanged) renderAnswersStructure();
-  else renderAnswersVotes();
+  // Rebuilding the answers list (voter chips grow/shrink it) while the name
+  // field has focus shifts everything below it right as a phone's on-screen
+  // keyboard is open - the "Add" button can move out from under a tap
+  // mid-interaction. Defer the rebuild until focus leaves that field.
+  if (document.activeElement !== el.nameInput) {
+    if (idsChanged) renderAnswersStructure();
+    else renderAnswersVotes();
+  }
   refreshNonStructural(data);
 }
 
