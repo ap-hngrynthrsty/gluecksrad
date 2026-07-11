@@ -591,6 +591,20 @@ function celebrateSupport(name, count, isOwnTip) {
   el.supportOverlay.classList.remove('hidden');
   startHearts();
 
+  // Whoever just tipped shouldn't see their own coffee button (or an
+  // invitation to tip again) on their own thank-you screen - hide it
+  // completely instead of moving it into the overlay.
+  if (isOwnTip) {
+    el.supportBtn.classList.remove('glow');
+    el.supportPrompt.classList.add('hidden');
+    el.supportBtnWrap.classList.add('hidden');
+    overlayTimer = setTimeout(() => {
+      el.supportOverlay.classList.add('hidden');
+      el.supportBtnWrap.classList.remove('hidden');
+    }, 7700);
+    return;
+  }
+
   // Move the button (with its glow + prompt) into the celebration overlay
   // itself for the duration: it's a sibling of .page, not a descendant, so
   // it never shook, but the dark backdrop (a higher z-index) was covering
@@ -601,10 +615,6 @@ function celebrateSupport(name, count, isOwnTip) {
     el.supportOverlay.classList.add('hidden');
     el.supportOverlay.parentNode.insertBefore(el.supportBtnWrap, el.supportOverlay);
   }, 7700);
-
-  // Whoever just tipped shouldn't be invited to tip again on their own
-  // thank-you screen - only show the glow + prompt to everyone else.
-  if (isOwnTip) return;
 
   el.supportBtn.classList.add('glow');
   const promptText = t('supportPromptNext');
