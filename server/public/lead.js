@@ -666,7 +666,7 @@ function celebrateSupport() {
   window.open('https://ko-fi.com/niludu', '_blank', 'noopener');
 
   document.body.classList.add('support-shake');
-  setTimeout(() => document.body.classList.remove('support-shake'), 18000);
+  setTimeout(() => document.body.classList.remove('support-shake'), 10000);
 
   el.supportFlicker.classList.remove('hidden');
   setTimeout(() => el.supportFlicker.classList.add('hidden'), 1600);

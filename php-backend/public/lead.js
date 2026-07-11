@@ -491,6 +491,7 @@ async function newSession() {
   el.questionInput.value = '';
   el.nameInput.value = '';
   el.allowAnswersToggle.checked = false;
+  el.answersList.innerHTML = '';
   const previousCode = sessionCode;
   localStorage.removeItem('dyntune_lead_code');
   const created = await fetch(`${API}create-session.php`, {
@@ -729,7 +730,7 @@ function celebrateSupport() {
   window.open('https://ko-fi.com/niludu', '_blank', 'noopener');
 
   document.body.classList.add('support-shake');
-  setTimeout(() => document.body.classList.remove('support-shake'), 18000);
+  setTimeout(() => document.body.classList.remove('support-shake'), 10000);
 
   el.supportFlicker.classList.remove('hidden');
   setTimeout(() => el.supportFlicker.classList.add('hidden'), 1600);
