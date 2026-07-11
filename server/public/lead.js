@@ -647,26 +647,38 @@ fetch('/api/qr').then(r => r.json()).then(data => {
 
 // ---------- support / donate celebration ----------
 let heartsRaf = null;
+let heartSprite = null;
+function getHeartSprite() {
+  if (heartSprite) return heartSprite;
+  const size = 64;
+  const off = document.createElement('canvas');
+  off.width = off.height = size;
+  const octx = off.getContext('2d');
+  octx.textAlign = 'center'; octx.textBaseline = 'middle';
+  octx.font = `${size * 0.8}px sans-serif`;
+  octx.fillText('❤️', size / 2, size / 2 + size * 0.04);
+  heartSprite = off;
+  return heartSprite;
+}
 function startHearts() {
   const c = el.heartsCanvas;
   const W = c.width = window.innerWidth, H = c.height = window.innerHeight;
   const ctx = c.getContext('2d');
+  const sprite = getHeartSprite();
   const P = [];
-  for (let i = 0; i < 700; i++) P.push({
+  for (let i = 0; i < 140; i++) P.push({
     x: Math.random() * W, y: H + Math.random() * H,
-    size: 14 + Math.random() * 20,
+    size: 22 + Math.random() * 28,
     vx: (Math.random() - 0.5) * 2.5, vy: -(2 + Math.random() * 5),
     rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.2
   });
   const t0 = performance.now();
   const draw = t => {
     ctx.clearRect(0, 0, W, H);
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     P.forEach(p => {
       p.x += p.vx; p.y += p.vy; p.vy += 0.015; p.rot += p.vr;
       ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
-      ctx.font = `${p.size}px sans-serif`;
-      ctx.fillText('❤️', 0, 0);
+      ctx.drawImage(sprite, -p.size / 2, -p.size / 2, p.size, p.size);
       ctx.restore();
     });
     if (t - t0 < 18000) heartsRaf = requestAnimationFrame(draw);
