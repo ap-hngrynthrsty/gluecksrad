@@ -18,6 +18,8 @@ const I18N = {
     winnerLabel: 'Winner',
     closeBtn: 'Close',
     noVotesYet: 'No votes yet',
+    supportBtn: '☕ Buy me a coffee',
+    supportThanks: 'Thank you!',
     answerPlaceholder: n => `Answer ${n}`,
     votesCount: n => `${n} vote${n === 1 ? '' : 's'}`,
     winnerMeta(v, p) { return `${this.votesCount(v)} · ${p}% of votes`; }
@@ -34,6 +36,8 @@ const I18N = {
     winnerLabel: 'Gewinner',
     closeBtn: 'Schließen',
     noVotesYet: 'Noch keine Stimmen',
+    supportBtn: '☕ Spendier mir einen Kaffee',
+    supportThanks: 'Danke!',
     answerPlaceholder: n => `Antwort ${n}`,
     votesCount: n => `${n} Stimmen`,
     winnerMeta(v, p) { return `${this.votesCount(v)} · ${p}% der Stimmen`; }
@@ -98,7 +102,12 @@ const el = {
   closeWinnerBtn: document.getElementById('closeWinnerBtn'),
   flicker: document.getElementById('flicker'),
   langEnBtn: document.getElementById('langEnBtn'),
-  langDeBtn: document.getElementById('langDeBtn')
+  langDeBtn: document.getElementById('langDeBtn'),
+  supportBtn: document.getElementById('supportBtn'),
+  supportOverlay: document.getElementById('supportOverlay'),
+  supportThanks: document.getElementById('supportThanks'),
+  supportFlicker: document.getElementById('supportFlicker'),
+  heartsCanvas: document.getElementById('heartsCanvas')
 };
 
 const savedName = localStorage.getItem('dyntune_name');
@@ -454,6 +463,54 @@ function setLang(newLang) {
 }
 el.langEnBtn.addEventListener('click', () => setLang('en'));
 el.langDeBtn.addEventListener('click', () => setLang('de'));
+
+// ---------- support / donate celebration ----------
+let heartsRaf = null;
+function startHearts() {
+  const c = el.heartsCanvas;
+  const W = c.width = window.innerWidth, H = c.height = window.innerHeight;
+  const ctx = c.getContext('2d');
+  const P = [];
+  for (let i = 0; i < 500; i++) P.push({
+    x: Math.random() * W, y: H + Math.random() * H,
+    size: 12 + Math.random() * 16,
+    vx: (Math.random() - 0.5) * 2.5, vy: -(2 + Math.random() * 5),
+    rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.2
+  });
+  const t0 = performance.now();
+  const draw = t => {
+    ctx.clearRect(0, 0, W, H);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    P.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.015; p.rot += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.font = `${p.size}px sans-serif`;
+      ctx.fillText('❤️', 0, 0);
+      ctx.restore();
+    });
+    if (t - t0 < 4500) heartsRaf = requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, W, H);
+  };
+  cancelAnimationFrame(heartsRaf);
+  heartsRaf = requestAnimationFrame(draw);
+}
+function celebrateSupport() {
+  window.open('https://ko-fi.com/niludu', '_blank', 'noopener');
+
+  document.body.classList.add('support-shake');
+  setTimeout(() => document.body.classList.remove('support-shake'), 1600);
+
+  el.supportFlicker.classList.remove('hidden');
+  setTimeout(() => el.supportFlicker.classList.add('hidden'), 1600);
+
+  const text = t('supportThanks');
+  el.supportThanks.textContent = text;
+  el.supportThanks.dataset.text = text;
+  el.supportOverlay.classList.remove('hidden');
+  startHearts();
+  setTimeout(() => el.supportOverlay.classList.add('hidden'), 4500);
+}
+el.supportBtn.addEventListener('click', celebrateSupport);
 
 applyStaticI18n();
 poll();

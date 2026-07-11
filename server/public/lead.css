@@ -275,3 +275,34 @@ input, textarea, select, button { font-family: inherit; }
 }
 .lang-btn:first-child { border-right: 1px solid #e2dfd7; }
 .lang-btn.active { background: #191922; color: #fff; }
+
+.support-btn {
+  position: fixed; bottom: 10px; left: 14px; font-size: 12px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #ff6b6b, #ff2d75); border: none; border-radius: 20px;
+  padding: 8px 14px; cursor: pointer; z-index: 1300; box-shadow: 0 3px 10px rgba(255,45,117,.35);
+}
+.support-btn:hover { filter: brightness(1.08); }
+
+.support-overlay {
+  position: fixed; inset: 0; z-index: 1450; display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+#heartsCanvas { position: fixed; inset: 0; width: 100vw; height: 100vh; }
+.support-thanks {
+  position: relative; font-family: 'Space Grotesk'; font-weight: 700; font-size: 64px; color: #fff;
+  text-shadow: 0 4px 24px rgba(0,0,0,.35); animation: skewGlitch 2.4s infinite, popIn .5s cubic-bezier(.2,.9,.3,1.2) both;
+}
+.support-thanks::before, .support-thanks::after {
+  content: attr(data-text); position: absolute; left: 0; top: 0; width: 100%; color: #fff;
+}
+.support-thanks::before { text-shadow: 3px 0 #ff2d75; animation: glitchTop 2.1s infinite linear; }
+.support-thanks::after { text-shadow: -3px 0 #23d5ff; animation: glitchBottom 2.6s infinite linear; }
+
+.support-shake { animation: supportShake .5s ease-in-out 3; }
+@keyframes supportShake {
+  0%,100% { transform: translate(0,0); }
+  20% { transform: translate(-6px,4px); }
+  40% { transform: translate(6px,-4px); }
+  60% { transform: translate(-5px,-5px); }
+  80% { transform: translate(5px,5px); }
+}
