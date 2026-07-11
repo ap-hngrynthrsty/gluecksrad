@@ -184,8 +184,8 @@ input, button { font-family: inherit; }
   flex-shrink: 0;
 }
 .like-btn {
-  appearance: none; border: none; background: transparent; cursor: pointer; font-size: 16px;
-  line-height: 1; padding: 2px;
+  appearance: none; border: none; background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 2px;
 }
 .like-btn:active { transform: scale(1.3); }
 .stats-count { font-weight: 700; color: #191922; font-variant-numeric: tabular-nums; }
@@ -193,10 +193,13 @@ input, button { font-family: inherit; }
 .stats-label { white-space: nowrap; }
 
 .support-btn {
-  position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+  /* Flows in the document instead of floating fixed at the bottom, so it
+     never overlaps the privacy link below it on the short code/name-gate
+     screens where there isn'''t much page content above it yet. */
+  display: block; width: max-content; margin: 24px auto 8px;
   font-size: 12px; font-weight: 700; color: #fff;
   background: linear-gradient(135deg, #ff6b6b, #ff2d75); border: none; border-radius: 20px;
-  padding: 9px 16px; cursor: pointer; z-index: 1300; box-shadow: 0 3px 10px rgba(255,45,117,.35);
+  padding: 9px 16px; cursor: pointer; box-shadow: 0 3px 10px rgba(255,45,117,.35);
 }
 
 .support-overlay {
