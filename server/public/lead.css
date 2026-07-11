@@ -337,4 +337,9 @@ input, textarea, select, button { font-family: inherit; }
   .wheel-wrap { width: min(340px, 82vw); }
   #questionDisplay { font-size: 22px; }
   .support-thanks { font-size: 44px; }
+
+  /* A bottom-fixed button collides with whatever card happens to be
+     in that corner once the layout stacks - let it flow in place
+     (it sits right after the wheel/spin section in the DOM) instead. */
+  .support-btn { position: static; display: block; width: max-content; margin: 20px auto 6px; }
 }
