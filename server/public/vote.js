@@ -591,12 +591,22 @@ function celebrateSupport(name, count, isOwnTip) {
   el.supportOverlay.classList.remove('hidden');
   startHearts();
 
+  // Always start from a clean layout state - a previous celebration may
+  // have left the button parented inside the overlay (if this device was
+  // a bystander last time) or hidden (if it was the tipper last time).
+  // Without this reset, alternating between those two roles across
+  // repeated tips could leave the button stuck invisible forever.
+  if (el.supportBtnWrap.parentNode === el.supportOverlay) {
+    el.supportOverlay.parentNode.insertBefore(el.supportBtnWrap, el.supportOverlay);
+  }
+  el.supportBtnWrap.classList.remove('hidden');
+  el.supportBtn.classList.remove('glow');
+  el.supportPrompt.classList.add('hidden');
+
   // Whoever just tipped shouldn't see their own coffee button (or an
   // invitation to tip again) on their own thank-you screen - hide it
   // completely instead of moving it into the overlay.
   if (isOwnTip) {
-    el.supportBtn.classList.remove('glow');
-    el.supportPrompt.classList.add('hidden');
     el.supportBtnWrap.classList.add('hidden');
     overlayTimer = setTimeout(() => {
       el.supportOverlay.classList.add('hidden');
