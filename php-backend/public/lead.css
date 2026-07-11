@@ -338,3 +338,16 @@ input, textarea, select, button { font-family: inherit; }
   30% { transform: translate(-50%,-60%) scale(1) rotate(0deg); opacity: 1; }
   100% { transform: translate(-50%,-220%) scale(.8) rotate(-8deg); opacity: 0; }
 }
+
+/* ---------- mobile / narrow screens ---------- */
+@media (max-width: 880px) {
+  .app { height: auto; min-height: 100vh; overflow: visible; }
+  .topbar { flex-wrap: wrap; row-gap: 10px; padding: 14px 16px; }
+  .header-actions { flex-wrap: wrap; justify-content: flex-end; row-gap: 8px; }
+  .layout { grid-template-columns: 1fr; padding: 16px; gap: 22px; }
+  .panel { max-height: none; overflow-y: visible; padding-right: 0; }
+  .stage { padding: 6px 0 28px; }
+  .wheel-wrap { width: min(340px, 82vw); }
+  #questionDisplay { font-size: 22px; }
+  .support-thanks { font-size: 44px; }
+}
