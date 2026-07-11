@@ -289,7 +289,7 @@ input, textarea, select, button { font-family: inherit; }
 }
 #heartsCanvas { position: fixed; inset: 0; width: 100vw; height: 100vh; }
 .support-thanks {
-  position: relative; font-family: 'Space Grotesk'; font-weight: 700; font-size: 64px; color: #fff;
+  position: relative; font-family: 'Space Grotesk'; font-weight: 800; font-size: 80px; color: #fff;
   text-shadow: 0 4px 24px rgba(0,0,0,.35); animation: skewGlitch 2.4s infinite, popIn .5s cubic-bezier(.2,.9,.3,1.2) both;
 }
 .support-thanks::before, .support-thanks::after {
@@ -298,11 +298,17 @@ input, textarea, select, button { font-family: inherit; }
 .support-thanks::before { text-shadow: 3px 0 #ff2d75; animation: glitchTop 2.1s infinite linear; }
 .support-thanks::after { text-shadow: -3px 0 #23d5ff; animation: glitchBottom 2.6s infinite linear; }
 
-.support-shake { animation: supportShake .5s ease-in-out 3; }
-@keyframes supportShake {
-  0%,100% { transform: translate(0,0); }
-  20% { transform: translate(-6px,4px); }
-  40% { transform: translate(6px,-4px); }
-  60% { transform: translate(-5px,-5px); }
-  80% { transform: translate(5px,5px); }
+.support-shake { animation: earthquakeShake .25s linear infinite; }
+@keyframes earthquakeShake {
+  0% { transform: translate(0,0) rotate(0deg); }
+  10% { transform: translate(-10px,7px) rotate(-1.2deg); }
+  20% { transform: translate(9px,-8px) rotate(1deg); }
+  30% { transform: translate(-8px,-6px) rotate(-1.5deg); }
+  40% { transform: translate(10px,8px) rotate(1.3deg); }
+  50% { transform: translate(-9px,5px) rotate(-1deg); }
+  60% { transform: translate(7px,-9px) rotate(1.4deg); }
+  70% { transform: translate(-7px,9px) rotate(-1.3deg); }
+  80% { transform: translate(9px,-6px) rotate(1deg); }
+  90% { transform: translate(-9px,-7px) rotate(-1.1deg); }
+  100% { transform: translate(0,0) rotate(0deg); }
 }

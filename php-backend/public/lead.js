@@ -716,7 +716,7 @@ function startHearts() {
       ctx.fillText('❤️', 0, 0);
       ctx.restore();
     });
-    if (t - t0 < 4500) heartsRaf = requestAnimationFrame(draw);
+    if (t - t0 < 9000) heartsRaf = requestAnimationFrame(draw);
     else ctx.clearRect(0, 0, W, H);
   };
   cancelAnimationFrame(heartsRaf);
@@ -726,7 +726,7 @@ function celebrateSupport() {
   window.open('https://ko-fi.com/niludu', '_blank', 'noopener');
 
   document.body.classList.add('support-shake');
-  setTimeout(() => document.body.classList.remove('support-shake'), 1600);
+  setTimeout(() => document.body.classList.remove('support-shake'), 9000);
 
   el.supportFlicker.classList.remove('hidden');
   setTimeout(() => el.supportFlicker.classList.add('hidden'), 1600);
@@ -736,7 +736,7 @@ function celebrateSupport() {
   el.supportThanks.dataset.text = text;
   el.supportOverlay.classList.remove('hidden');
   startHearts();
-  setTimeout(() => el.supportOverlay.classList.add('hidden'), 4500);
+  setTimeout(() => el.supportOverlay.classList.add('hidden'), 9000);
 }
 el.supportBtn.addEventListener('click', celebrateSupport);
 
