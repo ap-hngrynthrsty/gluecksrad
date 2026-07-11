@@ -124,7 +124,8 @@ const el = {
   supportOverlay: document.getElementById('supportOverlay'),
   supportThanks: document.getElementById('supportThanks'),
   supportFlicker: document.getElementById('supportFlicker'),
-  heartsCanvas: document.getElementById('heartsCanvas')
+  heartsCanvas: document.getElementById('heartsCanvas'),
+  app: document.querySelector('.app')
 };
 
 function colorFor(i, n) {
@@ -681,7 +682,7 @@ function startHearts() {
       ctx.drawImage(sprite, -p.size / 2, -p.size / 2, p.size, p.size);
       ctx.restore();
     });
-    if (t - t0 < 18000) heartsRaf = requestAnimationFrame(draw);
+    if (t - t0 < 7700) heartsRaf = requestAnimationFrame(draw);
     else ctx.clearRect(0, 0, W, H);
   };
   cancelAnimationFrame(heartsRaf);
@@ -690,8 +691,8 @@ function startHearts() {
 function celebrateSupport() {
   vibrate([30, 40, 30, 40, 30, 40, 200]);
 
-  document.body.classList.add('support-shake');
-  setTimeout(() => document.body.classList.remove('support-shake'), 10000);
+  el.app.classList.add('support-shake');
+  setTimeout(() => el.app.classList.remove('support-shake'), 7700);
 
   el.supportFlicker.classList.remove('hidden');
   setTimeout(() => el.supportFlicker.classList.add('hidden'), 1600);
@@ -701,7 +702,7 @@ function celebrateSupport() {
   el.supportThanks.dataset.text = text;
   el.supportOverlay.classList.remove('hidden');
   startHearts();
-  setTimeout(() => el.supportOverlay.classList.add('hidden'), 18000);
+  setTimeout(() => el.supportOverlay.classList.add('hidden'), 7700);
 
   // Open ko-fi last, and slightly deferred: on many mobile browsers
   // window.open() immediately backgrounds this tab, which throttles

@@ -53,26 +53,33 @@
     </div>
   </main>
 
-  <div id="winnerOverlay" class="winner-overlay hidden">
-    <canvas id="confettiCanvas"></canvas>
-    <div id="winnerCard" class="winner-card hidden">
-      <span class="winner-eyebrow" data-i18n="winnerLabel"></span>
-      <div id="winnerBadge" class="winner-badge"></div>
-      <div id="winnerLabel" class="winner-label glitch" data-text=""></div>
-      <span class="winner-meta" id="winnerMeta"></span>
-      <button id="closeWinnerBtn" class="btn btn-outline" data-i18n="closeBtn"></button>
-    </div>
-  </div>
-
-  <div id="flicker" class="flicker hidden"></div>
-
-  <button id="supportBtn" class="support-btn" data-i18n="supportBtn"></button>
-  <div id="supportOverlay" class="support-overlay hidden">
-    <canvas id="heartsCanvas"></canvas>
-    <div id="supportThanks" class="support-thanks glitch" data-text=""></div>
-  </div>
-  <div id="supportFlicker" class="flicker hidden"></div>
 </div>
+
+<!-- These overlays sit outside .page on purpose: .page is what gets
+     the "shake" transform for the tip celebration, and any
+     position:fixed element nested inside a transformed ancestor
+     stops being anchored to the real viewport - it gets clipped to
+     that ancestor's box instead, which made the celebration invisible
+     until scrolled to the top of the page. -->
+<div id="winnerOverlay" class="winner-overlay hidden">
+  <canvas id="confettiCanvas"></canvas>
+  <div id="winnerCard" class="winner-card hidden">
+    <span class="winner-eyebrow" data-i18n="winnerLabel"></span>
+    <div id="winnerBadge" class="winner-badge"></div>
+    <div id="winnerLabel" class="winner-label glitch" data-text=""></div>
+    <span class="winner-meta" id="winnerMeta"></span>
+    <button id="closeWinnerBtn" class="btn btn-outline" data-i18n="closeBtn"></button>
+  </div>
+</div>
+
+<div id="flicker" class="flicker hidden"></div>
+
+<button id="supportBtn" class="support-btn" data-i18n="supportBtn"></button>
+<div id="supportOverlay" class="support-overlay hidden">
+  <canvas id="heartsCanvas"></canvas>
+  <div id="supportThanks" class="support-thanks glitch" data-text=""></div>
+</div>
+<div id="supportFlicker" class="flicker hidden"></div>
 <script src="vote.js"></script>
 </body>
 </html>
