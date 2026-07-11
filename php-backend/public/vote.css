@@ -192,14 +192,33 @@ input, button { font-family: inherit; }
 .stats-sep { color: #d4d0c6; }
 .stats-label { white-space: nowrap; }
 
-.support-btn {
+.support-btn-wrap {
   /* Flows in the document instead of floating fixed at the bottom, so it
      never overlaps the privacy link below it on the short code/name-gate
-     screens where there isn'''t much page content above it yet. */
-  display: block; width: max-content; margin: 24px auto 8px;
+     screens where there isn't much page content above it yet. Position
+     relative (not static) so the speech-bubble prompt above it still
+     has something to anchor to. */
+  position: relative; display: block; width: max-content; margin: 24px auto 8px;
+}
+.support-btn {
   font-size: 12px; font-weight: 700; color: #fff;
   background: linear-gradient(135deg, #ff6b6b, #ff2d75); border: none; border-radius: 20px;
   padding: 9px 16px; cursor: pointer; box-shadow: 0 3px 10px rgba(255,45,117,.35);
+}
+.support-prompt {
+  position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+  margin-bottom: 10px; white-space: nowrap; background: #191922; color: #fff;
+  font-size: 11.5px; font-weight: 600; padding: 7px 11px; border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25);
+}
+.support-prompt::after {
+  content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: #191922;
+}
+.support-btn.glow { animation: supportGlow 1s ease-in-out infinite; }
+@keyframes supportGlow {
+  0%, 100% { box-shadow: 0 3px 10px rgba(255,45,117,.35); }
+  50% { box-shadow: 0 0 0 8px rgba(255,45,117,.4), 0 3px 18px rgba(255,45,117,.6); }
 }
 
 .support-overlay {

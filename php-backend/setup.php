@@ -16,6 +16,9 @@ foreach ($statements as $stmt) {
 // column are simply ignored.
 $migrations = [
     "ALTER TABLE sessions ADD COLUMN allow_participant_answers TINYINT(1) NOT NULL DEFAULT 0",
+    "ALTER TABLE sessions ADD COLUMN tip_count INT NOT NULL DEFAULT 0",
+    "ALTER TABLE sessions ADD COLUMN tip_round INT NOT NULL DEFAULT 0",
+    "ALTER TABLE sessions ADD COLUMN last_tipper_name VARCHAR(60) NULL",
 ];
 foreach ($migrations as $m) {
     try { $db->exec($m); } catch (PDOException $e) { /* column likely already exists */ }

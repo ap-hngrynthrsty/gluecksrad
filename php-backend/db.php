@@ -126,6 +126,9 @@ function publicState($db, $session) {
         'participantsCount' => $participantsCount,
         'round' => (int)$session['round'],
         'spin' => $session['spin_data'] ? json_decode($session['spin_data'], true) : null,
-        'allowParticipantAnswers' => (bool)$session['allow_participant_answers']
+        'allowParticipantAnswers' => (bool)$session['allow_participant_answers'],
+        'tipCount' => (int)($session['tip_count'] ?? 0),
+        'tipRound' => (int)($session['tip_round'] ?? 0),
+        'lastTipperName' => $session['last_tipper_name'] ?? null
     ];
 }

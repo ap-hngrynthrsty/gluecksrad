@@ -30,6 +30,9 @@ const I18N = {
     sessionsLabel: 'sessions',
     milestoneSession: n => `🎉 Congratulations - you just started session #${n}!`,
     milestoneHeart: n => `🎉 You just gave heart #${n} - thank you!`,
+    tipThanks: name => `${name} just bought me a coffee - thank you!`,
+    supportPromptNext: n => `Make it #${n}?`,
+    anonymousTipper: 'Someone',
     privacyLink: 'Privacy',
     noVotesYet: 'No votes yet',
     answerPlaceholder: n => `Answer ${n}`,
@@ -58,6 +61,9 @@ const I18N = {
     sessionsLabel: 'Sessions',
     milestoneSession: n => `🎉 Herzlichen Glückwunsch - du hast gerade Session Nr. ${n} gestartet!`,
     milestoneHeart: n => `🎉 Du hast gerade Herz Nr. ${n} verschenkt - danke!`,
+    tipThanks: name => `${name} hat mir gerade einen Kaffee ausgegeben - danke!`,
+    supportPromptNext: n => `Kaffee Nr. ${n} gefällig?`,
+    anonymousTipper: 'Jemand',
     privacyLink: 'Datenschutz',
     noVotesYet: 'Noch keine Stimmen',
     answerPlaceholder: n => `Antwort ${n}`,
@@ -95,6 +101,7 @@ let sessionCode = new URLSearchParams(location.search).get('code') || localStora
 let myAnswerId = null;
 let latest = { question: '', answers: [], segments: [], round: 0, spin: null };
 let displayedRound = null;
+let displayedTipRound = null;
 let knownIds = [];
 let rotation = -Math.PI / 2;
 let spinning = false;
@@ -133,6 +140,7 @@ const el = {
   supportOverlay: document.getElementById('supportOverlay'),
   supportThanks: document.getElementById('supportThanks'),
   supportFlicker: document.getElementById('supportFlicker'),
+  supportPrompt: document.getElementById('supportPrompt'),
   heartsCanvas: document.getElementById('heartsCanvas'),
   page: document.querySelector('.page'),
   likeBtn: document.getElementById('likeBtn'),
@@ -521,6 +529,16 @@ function applyState(data) {
     displayedRound = data.round;
     animateSpinTo(data.spin.winner, data.spin.segments);
   }
+
+  // Broadcasts the tip celebration to every connected device (lead + all
+  // participants), the same way spins are synced - and also to the
+  // tipping device itself on its next poll, so it still shows up even if
+  // that person only comes back from the ko-fi tab much later.
+  if (displayedTipRound === null) displayedTipRound = data.tipRound;
+  if (data.tipRound !== displayedTipRound) {
+    displayedTipRound = data.tipRound;
+    if (data.tipRound > 0) celebrateSupport(data.lastTipperName, data.tipCount);
+  }
 }
 
 let pollTimer = null;
@@ -603,7 +621,12 @@ function startHearts() {
   cancelAnimationFrame(heartsRaf);
   heartsRaf = requestAnimationFrame(draw);
 }
-function celebrateSupport() {
+// Triggered by the tip-round check in applyState() - i.e. by the *server*
+// confirming a tip happened, not directly by the click. That way every
+// connected device (lead + all participants) shows the same celebration,
+// including the tipping device itself on its next poll, no matter how
+// long it spent away on the ko-fi tab.
+function celebrateSupport(name, count) {
   vibrate([30, 40, 30, 40, 30, 40, 200]);
 
   el.page.classList.add('support-shake');
@@ -612,21 +635,43 @@ function celebrateSupport() {
   el.supportFlicker.classList.remove('hidden');
   setTimeout(() => el.supportFlicker.classList.add('hidden'), 1600);
 
-  const text = t('supportThanks');
+  const text = t('tipThanks', name || t('anonymousTipper'));
   el.supportThanks.textContent = text;
   el.supportThanks.dataset.text = text;
   el.supportOverlay.classList.remove('hidden');
   startHearts();
   setTimeout(() => el.supportOverlay.classList.add('hidden'), 7700);
 
+  // Glowing button + "want to make it the next one?" prompt, inviting
+  // whoever's watching (on any device) to tip again.
+  el.supportBtn.classList.add('glow');
+  const promptText = t('supportPromptNext', count + 1);
+  el.supportPrompt.textContent = promptText;
+  el.supportPrompt.classList.remove('hidden');
+  setTimeout(() => {
+    el.supportBtn.classList.remove('glow');
+    el.supportPrompt.classList.add('hidden');
+  }, 7700);
+}
+el.supportBtn.addEventListener('click', () => {
+  fetch(`${API}tip.php`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: sessionCode, name: currentName() || t('anonymousTipper') })
+  }).catch(() => {});
+
   // Open ko-fi last, and slightly deferred: on many mobile browsers
   // window.open() immediately backgrounds this tab, which throttles
-  // requestAnimationFrame and can make the celebration above appear to
-  // start very late. Queuing it after a frame lets the shake/hearts/
-  // text actually paint first.
+  // requestAnimationFrame and can make the celebration (triggered by the
+  // next poll, above) appear to start very late. Queuing it after a
+  // frame lets that poll fire and the celebration start painting first.
   setTimeout(() => window.open('https://ko-fi.com/niludu', '_blank', 'noopener'), 60);
-}
-el.supportBtn.addEventListener('click', celebrateSupport);
+});
+
+// A backgrounded tab throttles the poll interval, so returning from the
+// ko-fi tab could otherwise leave the celebration looking "missed" for a
+// while - force an immediate poll the moment this tab is visible again.
+document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
 
 applyStaticI18n();
 startPolling();

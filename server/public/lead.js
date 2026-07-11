@@ -40,6 +40,10 @@ const I18N = {
     helpStep4: 'Share the QR code or link so people on the same WiFi can join and vote from their own phone.',
     milestoneSession: n => `🎉 Congratulations - you just started session #${n}!`,
     milestoneHeart: n => `🎉 You just gave heart #${n} - thank you!`,
+    tipThanks: name => `${name} just bought me a coffee - thank you!`,
+    supportPromptNext: n => `Make it #${n}?`,
+    leadTipperLabel: 'The lead',
+    anonymousTipper: 'Someone',
     answerPlaceholder: n => `Answer ${n}`,
     optionsCount: n => `${n} option${n === 1 ? '' : 's'}`,
     votesCount: n => `${n} vote${n === 1 ? '' : 's'}`,
@@ -81,6 +85,10 @@ const I18N = {
     helpStep4: 'Teile den QR-Code oder Link, damit Personen im selben WLAN von ihrem eigenen Handy beitreten und abstimmen können.',
     milestoneSession: n => `🎉 Herzlichen Glückwunsch - du hast gerade Session Nr. ${n} gestartet!`,
     milestoneHeart: n => `🎉 Du hast gerade Herz Nr. ${n} verschenkt - danke!`,
+    tipThanks: name => `${name} hat mir gerade einen Kaffee ausgegeben - danke!`,
+    supportPromptNext: n => `Kaffee Nr. ${n} gefällig?`,
+    leadTipperLabel: 'Der Lead',
+    anonymousTipper: 'Jemand',
     answerPlaceholder: n => `Antwort ${n}`,
     optionsCount: n => `${n} Optionen`,
     votesCount: n => `${n} Stimmen`,
@@ -98,6 +106,7 @@ function t(key, ...args) {
 
 let latest = { question: '', answers: [], segments: [], participantsCount: 0, round: 0, spin: null };
 let displayedRound = null;
+let displayedTipRound = null;
 let rotation = -Math.PI / 2;
 let spinning = false;
 let winner = null;
@@ -140,6 +149,7 @@ const el = {
   supportOverlay: document.getElementById('supportOverlay'),
   supportThanks: document.getElementById('supportThanks'),
   supportFlicker: document.getElementById('supportFlicker'),
+  supportPrompt: document.getElementById('supportPrompt'),
   heartsCanvas: document.getElementById('heartsCanvas'),
   app: document.querySelector('.app'),
   likeBtn: document.getElementById('likeBtn'),
@@ -614,6 +624,16 @@ function refreshNonStructural(data) {
     el.flicker.classList.add('hidden');
     el.winnerCard.classList.remove('hidden');
   }
+
+  // Broadcasts the tip celebration to every connected device (lead + all
+  // participants), the same way spins are synced - and also to the
+  // tipping device itself on its next poll, so it still shows up even if
+  // that person only comes back from the ko-fi tab much later.
+  if (displayedTipRound === null) displayedTipRound = data.tipRound;
+  if (data.tipRound !== displayedTipRound) {
+    displayedTipRound = data.tipRound;
+    if (data.tipRound > 0) celebrateSupport(data.lastTipperName, data.tipCount);
+  }
 }
 
 function applyState(data) {
@@ -738,7 +758,12 @@ function startHearts() {
   cancelAnimationFrame(heartsRaf);
   heartsRaf = requestAnimationFrame(draw);
 }
-function celebrateSupport() {
+// Triggered by the tip-round check in refreshNonStructural() - i.e. by the
+// *server* confirming a tip happened, not directly by the click. That way
+// every connected device (lead + all participants) shows the same
+// celebration, including the tipping device itself on its next poll, no
+// matter how long it spent away on the ko-fi tab.
+function celebrateSupport(name, count) {
   vibrate([30, 40, 30, 40, 30, 40, 200]);
 
   el.app.classList.add('support-shake');
@@ -747,21 +772,43 @@ function celebrateSupport() {
   el.supportFlicker.classList.remove('hidden');
   setTimeout(() => el.supportFlicker.classList.add('hidden'), 1600);
 
-  const text = t('supportThanks');
+  const text = t('tipThanks', name || t('anonymousTipper'));
   el.supportThanks.textContent = text;
   el.supportThanks.dataset.text = text;
   el.supportOverlay.classList.remove('hidden');
   startHearts();
   setTimeout(() => el.supportOverlay.classList.add('hidden'), 7700);
 
+  // Glowing button + "want to make it the next one?" prompt, inviting
+  // whoever's watching (on any device) to tip again.
+  el.supportBtn.classList.add('glow');
+  const promptText = t('supportPromptNext', count + 1);
+  el.supportPrompt.textContent = promptText;
+  el.supportPrompt.classList.remove('hidden');
+  setTimeout(() => {
+    el.supportBtn.classList.remove('glow');
+    el.supportPrompt.classList.add('hidden');
+  }, 7700);
+}
+el.supportBtn.addEventListener('click', () => {
+  fetch('/api/tip', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: t('leadTipperLabel') })
+  }).catch(() => {});
+
   // Open ko-fi last, and slightly deferred: on many mobile browsers
   // window.open() immediately backgrounds this tab, which throttles
-  // requestAnimationFrame and can make the celebration above appear to
-  // start very late. Queuing it after a frame lets the shake/hearts/
-  // text actually paint first.
+  // requestAnimationFrame and can make the celebration (triggered by the
+  // next poll, above) appear to start very late. Queuing it after a
+  // frame lets that poll fire and the celebration start painting first.
   setTimeout(() => window.open('https://ko-fi.com/niludu', '_blank', 'noopener'), 60);
-}
-el.supportBtn.addEventListener('click', celebrateSupport);
+});
+
+// A backgrounded tab throttles the poll interval, so returning from the
+// ko-fi tab could otherwise leave the celebration looking "missed" for a
+// while - force an immediate poll the moment this tab is visible again.
+document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
 
 applyStaticI18n();
 poll();

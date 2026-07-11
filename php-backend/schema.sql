@@ -5,6 +5,9 @@ CREATE TABLE IF NOT EXISTS sessions (
   round INT NOT NULL DEFAULT 0,
   spin_data TEXT NULL,
   allow_participant_answers TINYINT(1) NOT NULL DEFAULT 0,
+  tip_count INT NOT NULL DEFAULT 0,
+  tip_round INT NOT NULL DEFAULT 0,
+  last_tipper_name VARCHAR(60) NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

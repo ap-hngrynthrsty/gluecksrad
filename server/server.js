@@ -23,7 +23,10 @@ const session = {
   participants: [],  // { id, deviceId (null for leads-added), name, answerId }
   round: 0,
   lastSpin: null,     // { segments, winner } frozen at the moment /api/spin was called
-  allowParticipantAnswers: false
+  allowParticipantAnswers: false,
+  tipCount: 0,
+  tipRound: 0,
+  lastTipperName: null
 };
 
 // Site-wide counters, kept separate from `session` so resetting a round never
@@ -78,7 +81,10 @@ function publicState() {
     participantsCount: session.participants.length,
     round: session.round,
     spin: session.lastSpin,
-    allowParticipantAnswers: session.allowParticipantAnswers
+    allowParticipantAnswers: session.allowParticipantAnswers,
+    tipCount: session.tipCount,
+    tipRound: session.tipRound,
+    lastTipperName: session.lastTipperName
   };
 }
 
@@ -212,9 +218,20 @@ const server = http.createServer(async (req, res) => {
       session.round = 0;
       session.lastSpin = null;
       session.allowParticipantAnswers = false;
+      session.tipCount = 0;
+      session.tipRound = 0;
+      session.lastTipperName = null;
       stats.sessionsCreated++;
       const sessionsMilestone = milestoneHit(stats.sessionsCreated);
       return sendJSON(res, 200, { ...publicState(), sessionsMilestone });
+    }
+    if (pathname === '/api/tip' && req.method === 'POST') {
+      const body = await readJSON(req);
+      const name = String(body.name || '').trim().slice(0, 60);
+      session.tipCount++;
+      session.tipRound++;
+      session.lastTipperName = name;
+      return sendJSON(res, 200, publicState());
     }
     if (pathname === '/api/stats' && req.method === 'GET') {
       return sendJSON(res, 200, { ...stats, heartsMilestone: null });
