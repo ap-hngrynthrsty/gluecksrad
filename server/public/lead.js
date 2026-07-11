@@ -711,6 +711,7 @@ fetch('/api/qr').then(r => r.json()).then(data => {
 
 // ---------- support / donate celebration ----------
 let heartsRaf = null;
+let shakeTimer = null, flickerTimer = null, overlayTimer = null, glowTimer = null;
 let heartSprite = null;
 const HEART_PATH = 'M23.6 0c-3.4 0-6.3 2-7.6 4.9C14.7 2 11.8 0 8.4 0 3.8 0 0 3.8 0 8.4c0 9.4 15.4 16.8 16 17.1.6-.3 16-7.7 16-17.1C32 3.8 28.2 0 23.6 0z';
 function getHeartSprite() {
@@ -767,11 +768,20 @@ function startHearts() {
 function celebrateSupport(name, count) {
   vibrate([30, 40, 30, 40, 30, 40, 200]);
 
+  // If a new tip arrives while the previous celebration is still running
+  // (e.g. someone clicks the glowing "make it the next one?" button before
+  // the first one finished), cancel its pending hide timers first - other-
+  // wise they fire mid-way through this one and cut it short.
+  clearTimeout(shakeTimer);
+  clearTimeout(flickerTimer);
+  clearTimeout(overlayTimer);
+  clearTimeout(glowTimer);
+
   el.app.classList.add('support-shake');
-  setTimeout(() => el.app.classList.remove('support-shake'), 7700);
+  shakeTimer = setTimeout(() => el.app.classList.remove('support-shake'), 7700);
 
   el.supportFlicker.classList.remove('hidden');
-  setTimeout(() => el.supportFlicker.classList.add('hidden'), 1600);
+  flickerTimer = setTimeout(() => el.supportFlicker.classList.add('hidden'), 1600);
 
   const text = t('tipThanks', name || t('anonymousTipper'));
   el.supportThanks.textContent = text;
@@ -785,7 +795,7 @@ function celebrateSupport(name, count) {
   // it in its usual corner spot. Inside the overlay it sits calmly below
   // the thank-you text and stays on top of the backdrop.
   el.supportOverlay.appendChild(el.supportBtnWrap);
-  setTimeout(() => {
+  overlayTimer = setTimeout(() => {
     el.supportOverlay.classList.add('hidden');
     el.supportOverlay.parentNode.insertBefore(el.supportBtnWrap, el.supportOverlay);
   }, 7700);
@@ -796,7 +806,7 @@ function celebrateSupport(name, count) {
   const promptText = t('supportPromptNext', count + 1);
   el.supportPrompt.textContent = promptText;
   el.supportPrompt.classList.remove('hidden');
-  setTimeout(() => {
+  glowTimer = setTimeout(() => {
     el.supportBtn.classList.remove('glow');
     el.supportPrompt.classList.add('hidden');
   }, 7700);
