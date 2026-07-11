@@ -14,7 +14,8 @@ const I18N = {
     codeHint: 'You get the code from the person who started the vote.',
     codeCheckingBtn: 'Checking …',
     codeNotFoundPlaceholder: 'Code not found - try again',
-    nameLabel: 'Your name',
+    nameLabel: 'Your name (optional)',
+    anonymousName: 'Anonymous',
     namePlaceholder: 'e.g. Alex',
     continueBtn: 'Continue',
     questionLabel: 'Question',
@@ -26,6 +27,7 @@ const I18N = {
     closeBtn: 'Close',
     supportBtn: '☕ Buy me a coffee',
     supportThanks: 'Thank you!',
+    sessionsLabel: 'sessions',
     privacyLink: 'Privacy',
     noVotesYet: 'No votes yet',
     answerPlaceholder: n => `Answer ${n}`,
@@ -38,7 +40,8 @@ const I18N = {
     codeHint: 'Den Code bekommst du von der Person, die die Abstimmung gestartet hat.',
     codeCheckingBtn: 'Prüfe …',
     codeNotFoundPlaceholder: 'Code nicht gefunden - nochmal prüfen',
-    nameLabel: 'Dein Name',
+    nameLabel: 'Dein Name (optional)',
+    anonymousName: 'Anonym',
     namePlaceholder: 'z. B. Alex',
     continueBtn: 'Weiter',
     questionLabel: 'Frage',
@@ -50,6 +53,7 @@ const I18N = {
     closeBtn: 'Schließen',
     supportBtn: '☕ Spendier mir einen Kaffee',
     supportThanks: 'Danke!',
+    sessionsLabel: 'Sessions',
     privacyLink: 'Datenschutz',
     noVotesYet: 'Noch keine Stimmen',
     answerPlaceholder: n => `Antwort ${n}`,
@@ -126,7 +130,10 @@ const el = {
   supportThanks: document.getElementById('supportThanks'),
   supportFlicker: document.getElementById('supportFlicker'),
   heartsCanvas: document.getElementById('heartsCanvas'),
-  page: document.querySelector('.page')
+  page: document.querySelector('.page'),
+  likeBtn: document.getElementById('likeBtn'),
+  heartsCount: document.getElementById('heartsCount'),
+  sessionsCount: document.getElementById('sessionsCount')
 };
 
 function apiGet(path) {
@@ -176,12 +183,8 @@ el.codeContinueBtn.addEventListener('click', async () => {
   }
 });
 
-el.nameInput.addEventListener('input', () => {
-  el.nameContinueBtn.disabled = !el.nameInput.value.trim();
-});
 el.nameContinueBtn.addEventListener('click', () => {
-  const name = el.nameInput.value.trim();
-  if (!name) return;
+  const name = el.nameInput.value.trim() || t('anonymousName');
   localStorage.setItem('dyntune_name', name);
   el.nameGate.classList.add('hidden');
   el.voteArea.classList.remove('hidden');
@@ -622,8 +625,35 @@ document.addEventListener("pointerup", e => {
   if (isDouble) {
     spawnLikeHeart(e.clientX, e.clientY);
     vibrate(18);
+    bumpHeartsCounter();
     lastTapAt = 0;
   } else {
     lastTapAt = now; lastTapX = e.clientX; lastTapY = e.clientY;
   }
 });
+
+
+// ---------- global site-wide stats (sessions started + hearts given) ----------
+function pollStats() {
+  fetch(`${API}stats.php`).then(r => r.json()).then(data => {
+    el.heartsCount.textContent = data.heartsGiven;
+    el.sessionsCount.textContent = data.sessionsCreated;
+  }).catch(() => {});
+}
+function bumpHeartsCounter() {
+  fetch(`${API}stats.php`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'heart' })
+  }).then(r => r.json()).then(data => {
+    el.heartsCount.textContent = data.heartsGiven;
+  }).catch(() => {});
+}
+el.likeBtn.addEventListener('click', () => {
+  const r = el.likeBtn.getBoundingClientRect();
+  spawnLikeHeart(r.left + r.width / 2, r.top + r.height / 2);
+  vibrate(15);
+  bumpHeartsCounter();
+});
+pollStats();
+setInterval(pollStats, 5000);

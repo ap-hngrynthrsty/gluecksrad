@@ -18,6 +18,13 @@
       <span class="brand-title">dyntune</span>
       <span class="brand-sub">dynamic tuning</span>
     </div>
+    <div class="stats-bar">
+      <button id="likeBtn" class="like-btn" type="button" title="Like">🤍</button>
+      <span id="heartsCount" class="stats-count">0</span>
+      <span class="stats-sep">&middot;</span>
+      <span id="sessionsCount" class="stats-count">0</span>
+      <span class="stats-label" data-i18n="sessionsLabel"></span>
+    </div>
     <div class="lang-switch">
       <button id="langEnBtn" class="lang-btn active" type="button">EN</button>
       <button id="langDeBtn" class="lang-btn" type="button">DE</button>
@@ -36,7 +43,7 @@
     <div id="nameGate" class="card">
       <span class="label" data-i18n="nameLabel"></span>
       <input id="nameInput" type="text" data-i18n-placeholder="namePlaceholder" maxlength="40">
-      <button id="nameContinueBtn" class="btn btn-dark" disabled data-i18n="continueBtn"></button>
+      <button id="nameContinueBtn" class="btn btn-dark" data-i18n="continueBtn"></button>
     </div>
 
     <div id="voteArea" class="vote-area hidden">

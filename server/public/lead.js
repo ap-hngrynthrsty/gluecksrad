@@ -32,6 +32,7 @@ const I18N = {
     removeParticipantTitle: 'Remove participant',
     supportBtn: '☕ Buy me a coffee',
     supportThanks: 'Thank you!',
+    sessionsLabel: 'sessions',
     answerPlaceholder: n => `Answer ${n}`,
     optionsCount: n => `${n} option${n === 1 ? '' : 's'}`,
     votesCount: n => `${n} vote${n === 1 ? '' : 's'}`,
@@ -65,6 +66,7 @@ const I18N = {
     removeParticipantTitle: 'Teilnehmer:in entfernen',
     supportBtn: '☕ Spendier mir einen Kaffee',
     supportThanks: 'Danke!',
+    sessionsLabel: 'Sessions',
     answerPlaceholder: n => `Antwort ${n}`,
     optionsCount: n => `${n} Optionen`,
     votesCount: n => `${n} Stimmen`,
@@ -125,7 +127,10 @@ const el = {
   supportThanks: document.getElementById('supportThanks'),
   supportFlicker: document.getElementById('supportFlicker'),
   heartsCanvas: document.getElementById('heartsCanvas'),
-  app: document.querySelector('.app')
+  app: document.querySelector('.app'),
+  likeBtn: document.getElementById('likeBtn'),
+  heartsCount: document.getElementById('heartsCount'),
+  sessionsCount: document.getElementById('sessionsCount')
 };
 
 function colorFor(i, n) {
@@ -734,8 +739,35 @@ document.addEventListener("pointerup", e => {
   if (isDouble) {
     spawnLikeHeart(e.clientX, e.clientY);
     vibrate(18);
+    bumpHeartsCounter();
     lastTapAt = 0;
   } else {
     lastTapAt = now; lastTapX = e.clientX; lastTapY = e.clientY;
   }
 });
+
+
+// ---------- global site-wide stats (sessions started + hearts given) ----------
+function pollStats() {
+  fetch('/api/stats').then(r => r.json()).then(data => {
+    el.heartsCount.textContent = data.heartsGiven;
+    el.sessionsCount.textContent = data.sessionsCreated;
+  }).catch(() => {});
+}
+function bumpHeartsCounter() {
+  fetch('/api/stats', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'heart' })
+  }).then(r => r.json()).then(data => {
+    el.heartsCount.textContent = data.heartsGiven;
+  }).catch(() => {});
+}
+el.likeBtn.addEventListener('click', () => {
+  const r = el.likeBtn.getBoundingClientRect();
+  spawnLikeHeart(r.left + r.width / 2, r.top + r.height / 2);
+  vibrate(15);
+  bumpHeartsCounter();
+});
+pollStats();
+setInterval(pollStats, 5000);

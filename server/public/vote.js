@@ -7,7 +7,8 @@ const CONFIG = {
 
 const I18N = {
   en: {
-    nameLabel: 'Your name',
+    nameLabel: 'Your name (optional)',
+    anonymousName: 'Anonymous',
     namePlaceholder: 'e.g. Alex',
     continueBtn: 'Continue',
     questionLabel: 'Question',
@@ -20,12 +21,14 @@ const I18N = {
     noVotesYet: 'No votes yet',
     supportBtn: '☕ Buy me a coffee',
     supportThanks: 'Thank you!',
+    sessionsLabel: 'sessions',
     answerPlaceholder: n => `Answer ${n}`,
     votesCount: n => `${n} vote${n === 1 ? '' : 's'}`,
     winnerMeta(v, p) { return `${this.votesCount(v)} · ${p}% of votes`; }
   },
   de: {
-    nameLabel: 'Dein Name',
+    nameLabel: 'Dein Name (optional)',
+    anonymousName: 'Anonym',
     namePlaceholder: 'z. B. Alex',
     continueBtn: 'Weiter',
     questionLabel: 'Frage',
@@ -38,6 +41,7 @@ const I18N = {
     noVotesYet: 'Noch keine Stimmen',
     supportBtn: '☕ Spendier mir einen Kaffee',
     supportThanks: 'Danke!',
+    sessionsLabel: 'Sessions',
     answerPlaceholder: n => `Antwort ${n}`,
     votesCount: n => `${n} Stimmen`,
     winnerMeta(v, p) { return `${this.votesCount(v)} · ${p}% der Stimmen`; }
@@ -108,7 +112,10 @@ const el = {
   supportThanks: document.getElementById('supportThanks'),
   supportFlicker: document.getElementById('supportFlicker'),
   heartsCanvas: document.getElementById('heartsCanvas'),
-  page: document.querySelector('.page')
+  page: document.querySelector('.page'),
+  likeBtn: document.getElementById('likeBtn'),
+  heartsCount: document.getElementById('heartsCount'),
+  sessionsCount: document.getElementById('sessionsCount')
 };
 
 const savedName = localStorage.getItem('dyntune_name');
@@ -118,12 +125,8 @@ if (savedName) {
   el.voteArea.classList.remove('hidden');
 }
 
-el.nameInput.addEventListener('input', () => {
-  el.nameContinueBtn.disabled = !el.nameInput.value.trim();
-});
 el.nameContinueBtn.addEventListener('click', () => {
-  const name = el.nameInput.value.trim();
-  if (!name) return;
+  const name = el.nameInput.value.trim() || t('anonymousName');
   localStorage.setItem('dyntune_name', name);
   el.nameGate.classList.add('hidden');
   el.voteArea.classList.remove('hidden');
@@ -559,8 +562,35 @@ document.addEventListener("pointerup", e => {
   if (isDouble) {
     spawnLikeHeart(e.clientX, e.clientY);
     vibrate(18);
+    bumpHeartsCounter();
     lastTapAt = 0;
   } else {
     lastTapAt = now; lastTapX = e.clientX; lastTapY = e.clientY;
   }
 });
+
+
+// ---------- global site-wide stats (sessions started + hearts given) ----------
+function pollStats() {
+  fetch('/api/stats').then(r => r.json()).then(data => {
+    el.heartsCount.textContent = data.heartsGiven;
+    el.sessionsCount.textContent = data.sessionsCreated;
+  }).catch(() => {});
+}
+function bumpHeartsCounter() {
+  fetch('/api/stats', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'heart' })
+  }).then(r => r.json()).then(data => {
+    el.heartsCount.textContent = data.heartsGiven;
+  }).catch(() => {});
+}
+el.likeBtn.addEventListener('click', () => {
+  const r = el.likeBtn.getBoundingClientRect();
+  spawnLikeHeart(r.left + r.width / 2, r.top + r.height / 2);
+  vibrate(15);
+  bumpHeartsCounter();
+});
+pollStats();
+setInterval(pollStats, 5000);

@@ -21,4 +21,6 @@ foreach ($migrations as $m) {
     try { $db->exec($m); } catch (PDOException $e) { /* column likely already exists */ }
 }
 
+$db->exec("INSERT IGNORE INTO stats (stat_key, value) VALUES ('sessions_created', 0), ('hearts_given', 0)");
+
 echo json_encode(['ok' => true, 'message' => 'Tabellen angelegt/aktualisiert.']);

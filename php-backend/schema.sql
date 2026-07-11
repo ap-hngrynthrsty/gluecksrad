@@ -26,3 +26,10 @@ CREATE TABLE IF NOT EXISTS participants (
   FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE,
   FOREIGN KEY (answer_id) REFERENCES answers(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Site-wide counters (not per-session): total sessions ever started, and
+-- total hearts/likes given across all users.
+CREATE TABLE IF NOT EXISTS stats (
+  stat_key VARCHAR(30) PRIMARY KEY,
+  value BIGINT UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

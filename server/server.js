@@ -26,6 +26,16 @@ const session = {
   allowParticipantAnswers: false
 };
 
+// Site-wide counters, kept separate from `session` so resetting a round never
+// wipes them. There's no per-code "create session" concept here (single
+// persistent room), so a Reset is the closest equivalent to "starting fresh".
+// Resets to 0 whenever the server process restarts - acceptable for a
+// same-WiFi, per-event tool with no database.
+const stats = {
+  sessionsCreated: 0,
+  heartsGiven: 0
+};
+
 function voteCounts() {
   const votes = {};
   session.answers.forEach(a => votes[a.id] = 0);
@@ -197,7 +207,16 @@ const server = http.createServer(async (req, res) => {
       session.round = 0;
       session.lastSpin = null;
       session.allowParticipantAnswers = false;
+      stats.sessionsCreated++;
       return sendJSON(res, 200, publicState());
+    }
+    if (pathname === '/api/stats' && req.method === 'GET') {
+      return sendJSON(res, 200, stats);
+    }
+    if (pathname === '/api/stats' && req.method === 'POST') {
+      const body = await readJSON(req);
+      if (body.action === 'heart') stats.heartsGiven++;
+      return sendJSON(res, 200, stats);
     }
     if (pathname === '/api/settings' && req.method === 'POST') {
       const body = await readJSON(req);

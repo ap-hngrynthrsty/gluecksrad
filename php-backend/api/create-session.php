@@ -24,4 +24,8 @@ do {
 $stmt = $db->prepare('INSERT INTO sessions (join_code, question, round) VALUES (?, ?, 0)');
 $stmt->execute([$code, '']);
 
+// Counts every freshly started session site-wide (not participants joining
+// an existing one via QR code, which never calls this endpoint).
+$db->exec("UPDATE stats SET value = value + 1 WHERE stat_key = 'sessions_created'");
+
 echo json_encode(['code' => $code]);
