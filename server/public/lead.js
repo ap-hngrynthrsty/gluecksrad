@@ -150,6 +150,7 @@ const el = {
   supportThanks: document.getElementById('supportThanks'),
   supportFlicker: document.getElementById('supportFlicker'),
   supportPrompt: document.getElementById('supportPrompt'),
+  supportBtnWrap: document.querySelector('.support-btn-wrap'),
   heartsCanvas: document.getElementById('heartsCanvas'),
   app: document.querySelector('.app'),
   likeBtn: document.getElementById('likeBtn'),
@@ -777,7 +778,17 @@ function celebrateSupport(name, count) {
   el.supportThanks.dataset.text = text;
   el.supportOverlay.classList.remove('hidden');
   startHearts();
-  setTimeout(() => el.supportOverlay.classList.add('hidden'), 7700);
+
+  // Move the button (with its glow + prompt) into the celebration overlay
+  // itself for the duration: it's a sibling of .app, not a descendant, so
+  // it never shook, but the dark backdrop (a higher z-index) was covering
+  // it in its usual corner spot. Inside the overlay it sits calmly below
+  // the thank-you text and stays on top of the backdrop.
+  el.supportOverlay.appendChild(el.supportBtnWrap);
+  setTimeout(() => {
+    el.supportOverlay.classList.add('hidden');
+    el.supportOverlay.parentNode.insertBefore(el.supportBtnWrap, el.supportOverlay);
+  }, 7700);
 
   // Glowing button + "want to make it the next one?" prompt, inviting
   // whoever's watching (on any device) to tip again.
