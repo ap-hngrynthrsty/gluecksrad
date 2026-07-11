@@ -488,7 +488,7 @@ function startHearts() {
       ctx.fillText('❤️', 0, 0);
       ctx.restore();
     });
-    if (t - t0 < 9000) heartsRaf = requestAnimationFrame(draw);
+    if (t - t0 < 18000) heartsRaf = requestAnimationFrame(draw);
     else ctx.clearRect(0, 0, W, H);
   };
   cancelAnimationFrame(heartsRaf);
@@ -498,7 +498,7 @@ function celebrateSupport() {
   window.open('https://ko-fi.com/niludu', '_blank', 'noopener');
 
   document.body.classList.add('support-shake');
-  setTimeout(() => document.body.classList.remove('support-shake'), 9000);
+  setTimeout(() => document.body.classList.remove('support-shake'), 18000);
 
   el.supportFlicker.classList.remove('hidden');
   setTimeout(() => el.supportFlicker.classList.add('hidden'), 1600);
@@ -508,10 +508,32 @@ function celebrateSupport() {
   el.supportThanks.dataset.text = text;
   el.supportOverlay.classList.remove('hidden');
   startHearts();
-  setTimeout(() => el.supportOverlay.classList.add('hidden'), 9000);
+  setTimeout(() => el.supportOverlay.classList.add('hidden'), 18000);
 }
 el.supportBtn.addEventListener('click', celebrateSupport);
 
 applyStaticI18n();
 poll();
 setInterval(poll, 1000);
+
+// ---------- double-tap "like" heart anywhere on screen ----------
+function spawnLikeHeart(x, y) {
+  const h = document.createElement("div");
+  h.className = "like-heart";
+  h.textContent = "❤️";
+  h.style.left = x + "px";
+  h.style.top = y + "px";
+  document.body.appendChild(h);
+  h.addEventListener("animationend", () => h.remove());
+}
+let lastTapAt = 0, lastTapX = 0, lastTapY = 0;
+document.addEventListener("pointerup", e => {
+  const now = Date.now();
+  const isDouble = now - lastTapAt < 350 && Math.hypot(e.clientX - lastTapX, e.clientY - lastTapY) < 60;
+  if (isDouble) {
+    spawnLikeHeart(e.clientX, e.clientY);
+    lastTapAt = 0;
+  } else {
+    lastTapAt = now; lastTapX = e.clientX; lastTapY = e.clientY;
+  }
+});
