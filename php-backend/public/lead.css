@@ -331,7 +331,7 @@ input, textarea, select, button { font-family: inherit; }
 }
 
 .like-heart {
-  position: fixed; z-index: 2000; pointer-events: none; font-size: 46px;
+  position: fixed; z-index: 2000; pointer-events: none; width: 46px; height: 46px;
   transform: translate(-50%, -50%);
   animation: likeHeartPop 1.1s ease-out forwards;
   filter: drop-shadow(0 3px 8px rgba(0,0,0,.25));
@@ -384,3 +384,20 @@ input, textarea, select, button { font-family: inherit; }
 }
 
 .btn, .support-btn { touch-action: manipulation; }
+
+.milestone-overlay {
+  position: fixed; inset: 0; z-index: 1600; display: flex; align-items: center; justify-content: center;
+  pointer-events: none; background: rgba(12,12,18,.75); backdrop-filter: blur(2px);
+}
+#milestoneConfetti { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; }
+.milestone-text {
+  position: relative; max-width: 84vw; text-align: center; font-family: 'Space Grotesk'; font-weight: 800;
+  font-size: 46px; line-height: 1.25; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,.35);
+  animation: skewGlitch 2.4s infinite, popIn .5s cubic-bezier(.2,.9,.3,1.2) both;
+  padding: 0 20px;
+}
+.milestone-text::before, .milestone-text::after {
+  content: attr(data-text); position: absolute; left: 0; top: 0; width: 100%; color: #fff;
+}
+.milestone-text::before { text-shadow: 3px 0 #ff2d75; animation: glitchTop 2.1s infinite linear; }
+.milestone-text::after { text-shadow: -3px 0 #23d5ff; animation: glitchBottom 2.6s infinite linear; }

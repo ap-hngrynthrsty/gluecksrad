@@ -27,5 +27,7 @@ $stmt->execute([$code, '']);
 // Counts every freshly started session site-wide (not participants joining
 // an existing one via QR code, which never calls this endpoint).
 $db->exec("UPDATE stats SET value = value + 1 WHERE stat_key = 'sessions_created'");
+$stmt = $db->query("SELECT value FROM stats WHERE stat_key = 'sessions_created'");
+$sessionsMilestone = milestoneHit((int)$stmt->fetchColumn());
 
-echo json_encode(['code' => $code]);
+echo json_encode(['code' => $code, 'sessionsMilestone' => $sessionsMilestone]);

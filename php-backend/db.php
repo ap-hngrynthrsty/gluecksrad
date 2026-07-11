@@ -37,6 +37,13 @@ function getDb() {
     return $pdo;
 }
 
+// Round numbers worth a special "you're the Nth!" celebration on the
+// site-wide sessions/hearts counters.
+function milestoneHit($n) {
+    $milestones = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000];
+    return in_array($n, $milestones, true) ? $n : null;
+}
+
 function genJoinCode() {
     $alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I to avoid confusion
     $code = '';

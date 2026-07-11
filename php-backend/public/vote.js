@@ -28,6 +28,8 @@ const I18N = {
     supportBtn: '☕ Buy me a coffee',
     supportThanks: 'Thank you!',
     sessionsLabel: 'sessions',
+    milestoneSession: n => `🎉 Congratulations - you just started session #${n}!`,
+    milestoneHeart: n => `🎉 You just gave heart #${n} - thank you!`,
     privacyLink: 'Privacy',
     noVotesYet: 'No votes yet',
     answerPlaceholder: n => `Answer ${n}`,
@@ -54,6 +56,8 @@ const I18N = {
     supportBtn: '☕ Spendier mir einen Kaffee',
     supportThanks: 'Danke!',
     sessionsLabel: 'Sessions',
+    milestoneSession: n => `🎉 Herzlichen Glückwunsch - du hast gerade Session Nr. ${n} gestartet!`,
+    milestoneHeart: n => `🎉 Du hast gerade Herz Nr. ${n} verschenkt - danke!`,
     privacyLink: 'Datenschutz',
     noVotesYet: 'Noch keine Stimmen',
     answerPlaceholder: n => `Antwort ${n}`,
@@ -133,7 +137,10 @@ const el = {
   page: document.querySelector('.page'),
   likeBtn: document.getElementById('likeBtn'),
   heartsCount: document.getElementById('heartsCount'),
-  sessionsCount: document.getElementById('sessionsCount')
+  sessionsCount: document.getElementById('sessionsCount'),
+  milestoneOverlay: document.getElementById('milestoneOverlay'),
+  milestoneConfetti: document.getElementById('milestoneConfetti'),
+  milestoneText: document.getElementById('milestoneText')
 };
 
 function apiGet(path) {
@@ -327,6 +334,13 @@ function segIndexFor(segs, rot) {
   for (let i = 0; i < segs.length; i++) if (t >= segs[i].f0 && t < segs[i].f1) return i;
   return segs.length - 1;
 }
+
+// ---------- compact number display (1.2K/3.4M, like social media counters) ----------
+// Tied to the app's own language toggle (not the browser locale), same as
+// every other piece of text on the page.
+const compactFmtEn = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 });
+const compactFmtDe = new Intl.NumberFormat('de-DE', { notation: 'compact', maximumFractionDigits: 1 });
+function formatCount(n) { return (lang === 'de' ? compactFmtDe : compactFmtEn).format(n); }
 
 // ---------- vibration (Android only - iOS Safari has no Vibration API) ----------
 function vibrate(pattern) {
@@ -534,6 +548,7 @@ function setLang(newLang) {
   renderOptions(latest.answers);
   if (!spinning) drawWheel(latest.segments);
   if (winner) fillWinnerCard();
+  pollStats();
 }
 el.langEnBtn.addEventListener('click', () => setLang('en'));
 el.langDeBtn.addEventListener('click', () => setLang('de'));
@@ -541,15 +556,23 @@ el.langDeBtn.addEventListener('click', () => setLang('de'));
 // ---------- support / donate celebration ----------
 let heartsRaf = null;
 let heartSprite = null;
+const HEART_PATH = 'M23.6 0c-3.4 0-6.3 2-7.6 4.9C14.7 2 11.8 0 8.4 0 3.8 0 0 3.8 0 8.4c0 9.4 15.4 16.8 16 17.1.6-.3 16-7.7 16-17.1C32 3.8 28.2 0 23.6 0z';
 function getHeartSprite() {
   if (heartSprite) return heartSprite;
   const size = 64;
   const off = document.createElement('canvas');
   off.width = off.height = size;
   const octx = off.getContext('2d');
-  octx.textAlign = 'center'; octx.textBaseline = 'middle';
-  octx.font = `${size * 0.8}px sans-serif`;
-  octx.fillText('❤️', size / 2, size / 2 + size * 0.04);
+  const scale = size / 32;
+  octx.save();
+  octx.translate(0, (size - 29 * scale) / 2);
+  octx.scale(scale, scale);
+  const grad = octx.createLinearGradient(0, 0, 0, 29);
+  grad.addColorStop(0, '#ff8a3d');
+  grad.addColorStop(1, '#ff2145');
+  octx.fillStyle = grad;
+  octx.fill(new Path2D(HEART_PATH));
+  octx.restore();
   heartSprite = off;
   return heartSprite;
 }
@@ -609,10 +632,12 @@ applyStaticI18n();
 startPolling();
 
 // ---------- double-tap "like" heart anywhere on screen ----------
+let heartSvgCounter = 0;
 function spawnLikeHeart(x, y) {
   const h = document.createElement("div");
   h.className = "like-heart";
-  h.textContent = "❤️";
+  const gid = "heartGrad" + (heartSvgCounter++);
+  h.innerHTML = `<svg viewBox="0 0 32 29" width="100%" height="100%"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a3d"/><stop offset="1" stop-color="#ff2145"/></linearGradient></defs><path fill="url(#${gid})" d="M23.6 0c-3.4 0-6.3 2-7.6 4.9C14.7 2 11.8 0 8.4 0 3.8 0 0 3.8 0 8.4c0 9.4 15.4 16.8 16 17.1.6-.3 16-7.7 16-17.1C32 3.8 28.2 0 23.6 0z"/></svg>`;
   h.style.left = x + "px";
   h.style.top = y + "px";
   document.body.appendChild(h);
@@ -620,6 +645,11 @@ function spawnLikeHeart(x, y) {
 }
 let lastTapAt = 0, lastTapX = 0, lastTapY = 0;
 document.addEventListener("pointerup", e => {
+  // Rapidly clicking a real button (e.g. the like button) also fires
+  // pointerup twice in a row - don't treat that as the double-tap-anywhere
+  // gesture, or every fast double-click on any control would spawn a
+  // heart and double-count it in the counter.
+  if (e.target.closest && e.target.closest("button, a, input, select, textarea, label")) return;
   const now = Date.now();
   const isDouble = now - lastTapAt < 350 && Math.hypot(e.clientX - lastTapX, e.clientY - lastTapY) < 60;
   if (isDouble) {
@@ -634,10 +664,55 @@ document.addEventListener("pointerup", e => {
 
 
 // ---------- global site-wide stats (sessions started + hearts given) ----------
+let milestoneConfettiRaf = null;
+function startMilestoneConfetti() {
+  const c = el.milestoneConfetti;
+  const W = c.width = window.innerWidth, H = c.height = window.innerHeight;
+  const ctx = c.getContext('2d');
+  const cols = ['#5a4bd6', '#ff2d75', '#23d5ff', '#ffb020', '#28c76f', '#8a7bff'];
+  const P = [];
+  for (let i = 0; i < 190; i++) P.push({
+    x: Math.random() * W, y: Math.random() * -H,
+    w: 6 + Math.random() * 8, h: 8 + Math.random() * 10,
+    vx: (Math.random() - 0.5) * 2, vy: 3 + Math.random() * 5,
+    rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.3,
+    col: cols[i % cols.length]
+  });
+  const t0 = performance.now();
+  const draw = t => {
+    ctx.clearRect(0, 0, W, H);
+    P.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.03; p.rot += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.col; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+    });
+    if (t - t0 < 5200) milestoneConfettiRaf = requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, W, H);
+  };
+  cancelAnimationFrame(milestoneConfettiRaf);
+  milestoneConfettiRaf = requestAnimationFrame(draw);
+}
+// Only the one request whose increment actually crosses a milestone gets this
+// flag from the server, so only that specific visitor sees the celebration -
+// not everyone who happens to be polling at the time.
+function celebrateMilestone(n, kind) {
+  const num = new Intl.NumberFormat(lang === 'de' ? 'de-DE' : 'en-US').format(n);
+  const text = kind === 'session' ? t('milestoneSession', num) : t('milestoneHeart', num);
+  el.milestoneText.textContent = text;
+  el.milestoneText.dataset.text = text;
+  el.milestoneOverlay.classList.remove('hidden');
+  startMilestoneConfetti();
+  playFanfare();
+  vibrate([40, 30, 40, 30, 160]);
+  setTimeout(() => el.milestoneOverlay.classList.add('hidden'), 5500);
+}
+
 function pollStats() {
   fetch(`${API}stats.php`).then(r => r.json()).then(data => {
-    el.heartsCount.textContent = data.heartsGiven;
-    el.sessionsCount.textContent = data.sessionsCreated;
+    el.heartsCount.textContent = formatCount(data.heartsGiven);
+    el.heartsCount.title = data.heartsGiven;
+    el.sessionsCount.textContent = formatCount(data.sessionsCreated);
+    el.sessionsCount.title = data.sessionsCreated;
   }).catch(() => {});
 }
 function bumpHeartsCounter() {
@@ -646,7 +721,9 @@ function bumpHeartsCounter() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'heart' })
   }).then(r => r.json()).then(data => {
-    el.heartsCount.textContent = data.heartsGiven;
+    el.heartsCount.textContent = formatCount(data.heartsGiven);
+    el.heartsCount.title = data.heartsGiven;
+    if (data.heartsMilestone) celebrateMilestone(data.heartsMilestone, 'heart');
   }).catch(() => {});
 }
 el.likeBtn.addEventListener('click', () => {

@@ -36,6 +36,11 @@ const stats = {
   heartsGiven: 0
 };
 
+// Round numbers worth a special "you're the Nth!" celebration on the
+// site-wide sessions/hearts counters.
+const MILESTONES = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000];
+function milestoneHit(n) { return MILESTONES.includes(n) ? n : null; }
+
 function voteCounts() {
   const votes = {};
   session.answers.forEach(a => votes[a.id] = 0);
@@ -208,15 +213,20 @@ const server = http.createServer(async (req, res) => {
       session.lastSpin = null;
       session.allowParticipantAnswers = false;
       stats.sessionsCreated++;
-      return sendJSON(res, 200, publicState());
+      const sessionsMilestone = milestoneHit(stats.sessionsCreated);
+      return sendJSON(res, 200, { ...publicState(), sessionsMilestone });
     }
     if (pathname === '/api/stats' && req.method === 'GET') {
-      return sendJSON(res, 200, stats);
+      return sendJSON(res, 200, { ...stats, heartsMilestone: null });
     }
     if (pathname === '/api/stats' && req.method === 'POST') {
       const body = await readJSON(req);
-      if (body.action === 'heart') stats.heartsGiven++;
-      return sendJSON(res, 200, stats);
+      let heartsMilestone = null;
+      if (body.action === 'heart') {
+        stats.heartsGiven++;
+        heartsMilestone = milestoneHit(stats.heartsGiven);
+      }
+      return sendJSON(res, 200, { ...stats, heartsMilestone });
     }
     if (pathname === '/api/settings' && req.method === 'POST') {
       const body = await readJSON(req);
