@@ -44,7 +44,7 @@ const I18N = {
     milestoneSession: n => `🎉 Congratulations - you just started session #${n}!`,
     milestoneHeart: n => `🎉 You just gave heart #${n} - thank you!`,
     tipThanks: name => `${name} just bought me a coffee - thank you!`,
-    supportPromptNext: n => `Make it #${n}?`,
+    supportPromptNext: 'One more? :)',
     leadTipperLabel: 'The lead',
     anonymousTipper: 'Someone',
     privacyLink: 'Privacy',
@@ -94,7 +94,7 @@ const I18N = {
     milestoneSession: n => `🎉 Herzlichen Glückwunsch - du hast gerade Session Nr. ${n} gestartet!`,
     milestoneHeart: n => `🎉 Du hast gerade Herz Nr. ${n} verschenkt - danke!`,
     tipThanks: name => `${name} hat mir gerade einen Kaffee ausgegeben - danke!`,
-    supportPromptNext: n => `Kaffee Nr. ${n} gefällig?`,
+    supportPromptNext: 'Noch einer? :)',
     leadTipperLabel: 'Der Lead',
     anonymousTipper: 'Jemand',
     privacyLink: 'Datenschutz',
@@ -120,6 +120,7 @@ let sessionCode = localStorage.getItem('dyntune_lead_code');
 let latest = { question: '', answers: [], segments: [], participantsCount: 0, round: 0, spin: null };
 let displayedRound = null;
 let displayedTipRound = null;
+let pendingOwnTip = false;
 let rotation = -Math.PI / 2;
 let spinning = false;
 let winner = null;
@@ -690,7 +691,9 @@ function refreshNonStructural(data) {
   if (displayedTipRound === null) displayedTipRound = data.tipRound;
   if (data.tipRound !== displayedTipRound) {
     displayedTipRound = data.tipRound;
-    if (data.tipRound > 0) celebrateSupport(data.lastTipperName, data.tipCount);
+    const isOwnTip = pendingOwnTip;
+    pendingOwnTip = false;
+    if (data.tipRound > 0) celebrateSupport(data.lastTipperName, data.tipCount, isOwnTip);
   }
 }
 
@@ -827,7 +830,7 @@ function startHearts() {
 // every connected device (lead + all participants) shows the same
 // celebration, including the tipping device itself on its next poll, no
 // matter how long it spent away on the ko-fi tab.
-function celebrateSupport(name, count) {
+function celebrateSupport(name, count, isOwnTip) {
   vibrate([30, 40, 30, 40, 30, 40, 200]);
 
   // If a new tip arrives while the previous celebration is still running
@@ -862,10 +865,12 @@ function celebrateSupport(name, count) {
     el.supportOverlay.parentNode.insertBefore(el.supportBtnWrap, el.supportOverlay);
   }, 7700);
 
-  // Glowing button + "want to make it the next one?" prompt, inviting
-  // whoever's watching (on any device) to tip again.
+  // Whoever just tipped shouldn't be invited to tip again on their own
+  // thank-you screen - only show the glow + prompt to everyone else.
+  if (isOwnTip) return;
+
   el.supportBtn.classList.add('glow');
-  const promptText = t('supportPromptNext', count + 1);
+  const promptText = t('supportPromptNext');
   el.supportPrompt.textContent = promptText;
   el.supportPrompt.classList.remove('hidden');
   glowTimer = setTimeout(() => {
@@ -874,6 +879,7 @@ function celebrateSupport(name, count) {
   }, 7700);
 }
 el.supportBtn.addEventListener('click', () => {
+  pendingOwnTip = true;
   fetch(`${API}tip.php`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

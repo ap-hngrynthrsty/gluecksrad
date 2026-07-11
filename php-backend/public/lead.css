@@ -334,7 +334,7 @@ input, textarea, select, button { font-family: inherit; }
 
 .support-overlay {
   position: fixed; inset: 0; z-index: 1450; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 30px;
+  align-items: center; justify-content: center; gap: 64px;
   pointer-events: none; background: rgba(12,12,18,.6); backdrop-filter: blur(2px);
 }
 /* While the button/prompt sit inside the overlay (celebrateSupport() moves
@@ -347,7 +347,8 @@ input, textarea, select, button { font-family: inherit; }
    own pointer-events: none so the button stays clickable while inside it.
 */
 .support-overlay .support-btn-wrap {
-  position: relative; display: block; width: max-content; margin: 0;
+  position: relative; top: auto; right: auto; bottom: auto; left: auto;
+  display: block; width: max-content; margin: 0;
   pointer-events: auto;
 }
 #heartsCanvas { position: fixed; inset: 0; width: 100vw; height: 100vh; }
@@ -406,7 +407,14 @@ input, textarea, select, button { font-family: inherit; }
      (it sits right after the wheel/spin section in the DOM) instead.
      position: relative (not static) so the speech-bubble prompt above
      it still has something to anchor to. */
-  .support-btn-wrap { position: relative; display: block; width: max-content; margin: 20px auto 6px; }
+  /* Reset top/right/bottom/left too - the desktop rule above sets one of
+     these (to anchor the corner-fixed button), and without resetting it
+     here it kept nudging this centered, relatively-positioned element off
+     to one side. */
+  .support-btn-wrap {
+    position: relative; top: auto; right: auto; bottom: auto; left: auto;
+    display: block; width: max-content; margin: 20px auto 6px;
+  }
 
   /* Any focused field under 16px makes iOS Safari auto-zoom the whole
      page in, which then looks cropped since layout doesn't reflow to

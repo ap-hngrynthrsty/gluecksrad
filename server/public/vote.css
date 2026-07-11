@@ -219,7 +219,7 @@ input, button { font-family: inherit; }
 
 .support-overlay {
   position: fixed; inset: 0; z-index: 1450; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 30px;
+  align-items: center; justify-content: center; gap: 64px;
   pointer-events: none; background: rgba(12,12,18,.6); backdrop-filter: blur(2px);
 }
 /* While the button/prompt sit inside the overlay (celebrateSupport() moves
@@ -232,7 +232,8 @@ input, button { font-family: inherit; }
    own pointer-events: none so the button stays clickable while inside it.
 */
 .support-overlay .support-btn-wrap {
-  position: relative; display: block; width: max-content; margin: 0;
+  position: relative; top: auto; right: auto; bottom: auto; left: auto;
+  display: block; width: max-content; margin: 0;
   pointer-events: auto;
 }
 #heartsCanvas { position: fixed; inset: 0; width: 100vw; height: 100vh; }
